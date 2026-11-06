@@ -1,0 +1,51 @@
+/* templates/noir.css — "Midnight Velvet": art-deco navy, champagne gold, a sky full of stars. */
+@import url('https://fonts.googleapis.com/css2?family=Poiret+One&family=Josefin+Sans:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #070B14; --paper: #0F1626; --ink: #F2E9D6; --text-secondary: #B6AB92;
+  --olive: #C9A66B; --olive-dark: #E6C98F; --olive-soft: #1B2438;
+  --terracotta: #D9B878; --border: rgba(201,166,107,.26); --danger: #FF9A8A; --placeholder-bg: #17203A;
+  --on-primary: #0B0F1A; --on-accent: #0B0F1A;
+  --toast-bg: #E6C98F; --toast-fg: #0B0F1A; --note-focus-bg: #141C30;
+  --search-tint: rgba(7,11,20,.6); --bar-solid: rgba(7,11,20,.94);
+
+  --font-head: 'Poiret One', sans-serif; --font-body: 'Josefin Sans', sans-serif;
+  --font-cover: 'Poiret One', sans-serif; --font-cover-sub: 'Josefin Sans', sans-serif; --font-item: 'Josefin Sans', sans-serif;
+
+  --bg-a: rgba(38,64,150,.55); --bg-b: rgba(20,30,84,.72); --bg-c: rgba(155,108,40,.26); --bg-d: rgba(30,96,116,.34); --bg-dur: 36s;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E %3Cg stroke='%23C9A66B' stroke-width='.6' fill='none'%3E%3Cpath d='M0 0 L36 36 M36 0 L0 36'/%3E%3Cpath d='M18 0 V36 M0 18 H36' opacity='.5'/%3E%3C/g%3E %3Crect x='16' y='16' width='4' height='4' transform='rotate(45 18 18)' fill='%23C9A66B'/%3E%3C/svg%3E"); --pattern-size: 36px; --pattern-o: .06;
+  --glass: rgba(15,22,38,.68); --glass-line: rgba(201,166,107,.3); --glass-blur: 10px;
+  --btn-bg: linear-gradient(180deg, #EBD3A0, #C9A66B 55%, #A5834A);
+  --btn-shadow: 0 8px 20px -8px rgba(201,166,107,.55), inset 0 1px 0 rgba(255,255,255,.35);
+  --rule: linear-gradient(90deg, transparent, #C9A66B 25%, #C9A66B 75%, transparent);
+  --glow: #C9A66B; --shadow-soft: 0 14px 30px -20px rgba(0,0,0,.9);
+  --item-r: 2px; --photo-r: 2px; --search-r: 2px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 L20 12 L12 22 L4 12 Z' fill='none' stroke='%23C9A66B' stroke-width='1.6'/%3E%3Cpath d='M12 7 L16 12 L12 17 L8 12 Z' fill='%23C9A66B'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 88'%3E %3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23F5E6BE'/%3E%3Cstop offset='1' stop-color='%23B08D4E'/%3E%3C/linearGradient%3E%3C/defs%3E %3Cg stroke='url(%23g)' stroke-width='2' fill='none' stroke-linecap='round'%3E%3Cpath d='M38.7 68.3 L-1.8 57.4'/%3E%3Cpath d='M40.9 63.0 L16.7 49.0'/%3E%3Cpath d='M44.4 58.4 L14.7 28.7'/%3E%3Cpath d='M49.0 54.9 L35.0 30.7'/%3E%3Cpath d='M54.3 52.7 L43.4 12.2'/%3E%3Cpath d='M60.0 52.0 L60.0 24.0'/%3E%3Cpath d='M65.7 52.7 L76.6 12.2'/%3E%3Cpath d='M71.0 54.9 L85.0 30.7'/%3E%3Cpath d='M75.6 58.4 L105.3 28.7'/%3E%3Cpath d='M79.1 63.0 L103.3 49.0'/%3E%3Cpath d='M81.3 68.3 L121.8 57.4'/%3E %3Cpath d='M46 74 A14 14 0 0 1 74 74'/%3E%3Cpath d='M38 74 A22 22 0 0 1 82 74'/%3E %3Cpath d='M8 80 H112' stroke-width='2.4'/%3E%3Cpath d='M30 87 H90' stroke-width='1.4' opacity='.7'/%3E%3C/g%3E %3Cpath d='M60 66 l4 8 -4 8 -4 -8 Z' fill='url(%23g)'/%3E%3C/svg%3E"); --emblem-w: 124px; --emblem-h: 90px;
+  --head-w: 400; --h1-size: 34px; --h1-ls: .22em; --h1-tt: uppercase; --cat-size: 22px; --cat-ls: .26em;
+}
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #A5834A 0%, #F5E6BE 35%, #C9A66B 52%, #F5E6BE 70%, #A5834A 100%);
+  background-size: 220% 100%; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; animation: txShine 7s linear infinite;
+}
+.mi-name { letter-spacing: .04em; }
+.mi-price { letter-spacing: .06em; font-weight: 600; }
+.menu-item { border-left: 2px solid var(--terracotta); }
+.category-title { font-size: 22px; }
+
+.cover-border {
+  --cover-card: rgba(8,12,22,.62);
+  max-width: 372px; padding: 50px 30px 42px; border: 1px solid rgba(201,166,107,.55); border-radius: 0;
+  outline: 1px solid rgba(201,166,107,.22); outline-offset: 8px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(0 0) scale(1 1)'%3E%3Cpath d='M2 62 V20 L20 2 H62' fill='none' stroke='%23C9A66B' stroke-width='1.6'/%3E %3Cpath d='M9 62 V24 L24 9 H62' fill='none' stroke='%23C9A66B' stroke-width='.8' opacity='.6'/%3E %3Crect x='12' y='12' width='7' height='7' transform='rotate(45 15.5 15.5)' fill='%23C9A66B'/%3E%3C/g%3E%3C/svg%3E") top left / 54px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cpath d='M2 62 V20 L20 2 H62' fill='none' stroke='%23C9A66B' stroke-width='1.6'/%3E %3Cpath d='M9 62 V24 L24 9 H62' fill='none' stroke='%23C9A66B' stroke-width='.8' opacity='.6'/%3E %3Crect x='12' y='12' width='7' height='7' transform='rotate(45 15.5 15.5)' fill='%23C9A66B'/%3E%3C/g%3E%3C/svg%3E") top right / 54px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cpath d='M2 62 V20 L20 2 H62' fill='none' stroke='%23C9A66B' stroke-width='1.6'/%3E %3Cpath d='M9 62 V24 L24 9 H62' fill='none' stroke='%23C9A66B' stroke-width='.8' opacity='.6'/%3E %3Crect x='12' y='12' width='7' height='7' transform='rotate(45 15.5 15.5)' fill='%23C9A66B'/%3E%3C/g%3E%3C/svg%3E") bottom left / 54px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cpath d='M2 62 V20 L20 2 H62' fill='none' stroke='%23C9A66B' stroke-width='1.6'/%3E %3Cpath d='M9 62 V24 L24 9 H62' fill='none' stroke='%23C9A66B' stroke-width='.8' opacity='.6'/%3E %3Crect x='12' y='12' width='7' height='7' transform='rotate(45 15.5 15.5)' fill='%23C9A66B'/%3E%3C/g%3E%3C/svg%3E") bottom right / 54px no-repeat,
+    var(--cover-card);
+  box-shadow: 0 34px 80px -30px #000, 0 0 60px -24px rgba(201,166,107,.4);
+}
+.cover-cafe-name { font-style: normal; font-weight: 600; text-transform: uppercase; letter-spacing: .44em; font-size: 11.5px; color: #D9B878; margin-bottom: 14px; padding-left: .44em; }
+.cover-menu-word { font-size: 60px; letter-spacing: .24em; padding-left: .24em; margin-bottom: 22px; font-weight: 400; }
+.cover-illustration { margin-bottom: 22px; }
+.cover-meta { font-weight: 500; letter-spacing: .05em; }
+.cover-meta .cover-hours { letter-spacing: .1em; text-transform: uppercase; font-size: 11.5px; color: #E6C98F; }

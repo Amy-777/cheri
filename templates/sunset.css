@@ -1,0 +1,55 @@
+/* templates/sunset.css — "Golden Hour": a sky that never stops turning, slow bokeh, a sun behind the title card. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #FFEFE0; --paper: #FFF8F0; --ink: #3B1B2E; --text-secondary: #7A5163;
+  --olive: #C9431E; --olive-dark: #B23A15; --olive-soft: #FFE0CC;
+  --terracotta: #BF3B6A; --border: rgba(210,74,34,.2); --danger: #B3261E; --placeholder-bg: #FFE3CF;
+  --on-primary: #FFFFFF; --on-accent: #FFFFFF;
+  --toast-bg: #3B1B2E; --toast-fg: #FFFFFF; --note-focus-bg: #FFFFFF;
+  --search-tint: rgba(255,239,224,.6); --bar-solid: rgba(255,239,224,.94);
+
+  --font-head: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
+  --font-cover: 'DM Serif Display', serif; --font-cover-sub: 'DM Serif Display', serif; --font-item: 'DM Sans', sans-serif;
+
+  --bg-a: rgba(255,150,80,.78); --bg-b: rgba(255,105,150,.62); --bg-c: rgba(165,112,232,.52); --bg-d: rgba(255,214,120,.8); --bg-dur: 22s;
+  --glass: rgba(255,250,244,.72); --glass-line: rgba(210,74,34,.2); --glass-blur: 12px;
+  --btn-bg: linear-gradient(100deg, #D9541F, #C9431E 50%, #B8306A);
+  --btn-shadow: 0 10px 22px -10px rgba(200,56,106,.65), inset 0 1px 0 rgba(255,255,255,.35);
+  --rule: linear-gradient(90deg, #E8642A, #C8386A 60%, rgba(200,56,106,0));
+  --glow: #E8642A; --shadow-soft: 0 14px 30px -18px rgba(150,50,40,.45);
+  --item-r: 20px; --photo-r: 14px; --search-r: 28px;
+  --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 84'%3E %3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23FFE08A'/%3E%3Cstop offset='.55' stop-color='%23FF8A5B'/%3E%3Cstop offset='1' stop-color='%23E0407A'/%3E%3C/linearGradient%3E%3CclipPath id='c'%3E%3Crect width='120' height='58'/%3E%3C/clipPath%3E%3C/defs%3E %3Cg stroke='%23FF8A5B' stroke-width='3' stroke-linecap='round' opacity='.9'%3E%3Cpath d='M28.5 50.4 L14.7 48.0'/%3E%3Cpath d='M31.2 42.0 L18.7 35.8'/%3E%3Cpath d='M36.2 34.6 L25.8 25.2'/%3E%3Cpath d='M43.0 28.9 L35.6 17.0'/%3E%3Cpath d='M51.2 25.2 L47.3 11.8'/%3E%3Cpath d='M60.0 24.0 L60.0 10.0'/%3E%3Cpath d='M68.8 25.2 L72.7 11.8'/%3E%3Cpath d='M77.0 28.9 L84.4 17.0'/%3E%3Cpath d='M83.8 34.6 L94.2 25.2'/%3E%3Cpath d='M88.8 42.0 L101.3 35.8'/%3E%3Cpath d='M91.5 50.4 L105.3 48.0'/%3E%3C/g%3E %3Ccircle cx='60' cy='56' r='26' fill='url(%23s)' clip-path='url(%23c)'/%3E %3Cg stroke='%23E0407A' stroke-linecap='round' fill='none'%3E%3Cpath d='M14 62 H106' stroke-width='3'/%3E%3Cpath d='M26 70 H94' stroke-width='2.6' opacity='.8'/%3E%3Cpath d='M40 78 H80' stroke-width='2.2' opacity='.6'/%3E%3C/g%3E%3C/svg%3E"); --emblem-w: 124px; --emblem-h: 88px;
+  --head-w: 400; --h1-size: 36px; --h1-ls: 0; --cat-tt: none; --cat-ls: 0; --cat-size: 26px;
+}
+/* the sun's rays, turning slowly above the page */
+html::before {
+  content: ""; position: fixed; left: 50%; top: -85vmax; width: 170vmax; height: 170vmax; margin-left: -85vmax; z-index: -2; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,214,140,.34) 0deg 5deg, rgba(255,214,140,0) 5deg 17deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0, rgba(0,0,0,.5) 42%, transparent 60%); mask-image: radial-gradient(circle at 50% 50%, #000 0, rgba(0,0,0,.5) 42%, transparent 60%);
+  animation: txSpin 120s linear infinite;
+}
+@keyframes txSpin { to { transform: rotate(360deg); } }
+@keyframes txSun { 0%, 100% { transform: translate(-50%, -56%) scale(1); } 50% { transform: translate(-50%, -56%) scale(1.06); } }
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #D24A22, #C8386A 55%, #8E3AC0); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.category-title { font-weight: 400; }
+
+/* cover: a big sun glows behind a frosted card */
+.cover-face { overflow: hidden; }
+.cover-face::before {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 560px; height: 560px; border-radius: 50%;
+  background: radial-gradient(circle, #FFE08A 0, #FFB064 34%, #FF7A8C 62%, rgba(255,122,140,0) 71%); opacity: .9;
+  transform: translate(-50%, -56%); animation: txSun 8s ease-in-out infinite; pointer-events: none;
+}
+.cover-border {
+  --cover-card: rgba(255,248,240,.72);
+  position: relative; max-width: 360px; padding: 46px 28px 40px; border: 1.5px solid rgba(255,255,255,.8); border-radius: 34px;
+  box-shadow: 0 34px 80px -34px rgba(160,50,60,.7);
+}
+.cover-cafe-name { font-style: italic; font-size: 20px; color: #BF3B6A; margin-bottom: 2px; }
+.cover-menu-word { font-size: 66px; letter-spacing: .02em; text-transform: none; margin-bottom: 14px; font-weight: 400; }
+.cover-meta .cover-hours { color: #B23A15; }

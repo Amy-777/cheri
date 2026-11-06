@@ -1,0 +1,54 @@
+/* templates/botanical.css — "Botanical Terrace": a sunny greenhouse terrace. Leaf shadows sway across the page,
+   leaves drift down, terracotta pots, and the cover is an arched glasshouse window with a plant that moves in the breeze. */
+@import url('https://fonts.googleapis.com/css2?family=Young+Serif&family=Karla:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #EEF3EA; --paper: #FBFDF9; --ink: #1F3326; --text-secondary: #57705F;
+  --olive: #2F6B45; --olive-dark: #24583A; --olive-soft: #DCEBDD;
+  --terracotta: #C2643C; --border: rgba(47,107,69,.2); --danger: #A8341F; --placeholder-bg: #DDE9DC;
+  --on-primary: #FFFFFF; --on-accent: #FFFFFF;
+  --toast-bg: #1F3326; --toast-fg: #EEF3EA; --note-focus-bg: #FFFFFF;
+  --search-tint: rgba(238,243,234,.6); --bar-solid: rgba(238,243,234,.94);
+
+  --font-head: 'Young Serif', serif; --font-body: 'Karla', sans-serif;
+  --font-cover: 'Young Serif', serif; --font-cover-sub: 'Karla', sans-serif; --font-item: 'Karla', sans-serif; --item-w: 700;
+
+  --bg-a: rgba(255,232,150,.72); --bg-b: rgba(160,210,170,.6); --bg-c: rgba(255,200,170,.5); --bg-d: rgba(200,230,200,.7); --bg-dur: 26s;
+  --glass: rgba(251,253,249,.74); --glass-line: rgba(47,107,69,.16); --glass-blur: 10px;
+  --btn-bg: linear-gradient(180deg, #3E8A55, #2F6B45 60%, #24583A);
+  --btn-shadow: 0 10px 22px -10px rgba(47,107,69,.65), inset 0 1px 0 rgba(255,255,255,.3);
+  --rule: linear-gradient(90deg, #C2643C 0 22px, rgba(47,107,69,.25) 22px, transparent);
+  --glow: #8BC79A; --shadow-soft: 0 14px 30px -20px rgba(31,51,38,.45);
+  --item-r: 18px; --photo-r: 12px; --search-r: 24px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 20 C4 10 10 4 20 4 C20 14 14 20 4 20 Z' fill='%233E8A55'/%3E%3Cpath d='M4 20 L15 9' stroke='%23EEF3EA' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E %3Cstyle%3E@keyframes w%7B0%25,100%25%7Btransform:rotate(-3deg)%7D50%25%7Btransform:rotate(3deg)%7D%7D.l%7Btransform-origin:60px 70px;animation:w 4s ease-in-out infinite%7D.r%7Banimation-delay:-2s%7D%3C/style%3E %3Cg class='l'%3E%3Cpath d='M60 70 C40 64 22 44 30 22 C46 26 58 44 60 70 Z' fill='%233E8A55'/%3E%3Cpath d='M60 70 C46 52 40 36 34 26' stroke='%2324603A' stroke-width='1.6' fill='none'/%3E%3C/g%3E %3Cg class='l r'%3E%3Cpath d='M60 70 C80 64 98 44 90 22 C74 26 62 44 60 70 Z' fill='%235BA36C'/%3E%3Cpath d='M60 70 C74 52 80 36 86 26' stroke='%232F7046' stroke-width='1.6' fill='none'/%3E%3C/g%3E %3Cpath d='M60 72 C58 46 62 30 60 10 C70 22 72 46 60 72 Z' fill='%232F6B45'/%3E %3Cpath d='M38 72 H82 L76 104 H44 Z' fill='%23C2643C'/%3E%3Cpath d='M34 68 H86 V76 H34 Z' fill='%23D97A50'/%3E %3Cpath d='M46 86 H74' stroke='%23F2C9A8' stroke-width='2' stroke-linecap='round' opacity='.7'/%3E%3C/svg%3E"); --emblem-w: 120px; --emblem-h: 110px;
+  --h1-size: 34px; --h1-ls: 0; --cat-tt: none; --cat-ls: .01em; --cat-size: 24px;
+}
+/* dappled shade: leaf shadows from an unseen canopy, swaying slowly */
+html::after {
+  content: ""; position: fixed; inset: -10%; z-index: -2; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cpath d='M0 0 C18 -26 52 -26 70 0 C52 26 18 26 0 0 Z' transform='translate(10 40) rotate(-30) scale(1.4)' fill='%231E4A2E'/%3E%3Cpath d='M0 0 C18 -26 52 -26 70 0 C52 26 18 26 0 0 Z' transform='translate(40 140) rotate(20) scale(1.1)' fill='%231E4A2E'/%3E%3Cpath d='M0 0 C18 -26 52 -26 70 0 C52 26 18 26 0 0 Z' transform='translate(150 30) rotate(60) scale(1.3)' fill='%231E4A2E'/%3E%3Cpath d='M0 0 C18 -26 52 -26 70 0 C52 26 18 26 0 0 Z' transform='translate(170 170) rotate(-40) scale(1.5)' fill='%231E4A2E'/%3E%3Cpath d='M0 0 C18 -26 52 -26 70 0 C52 26 18 26 0 0 Z' transform='translate(90 90) rotate(10) scale(0.9)' fill='%231E4A2E'/%3E%3Cpath d='M0 0 C18 -26 52 -26 70 0 C52 26 18 26 0 0 Z' transform='translate(-10 190) rotate(-10) scale(1.2)' fill='%231E4A2E'/%3E%3C/svg%3E") 0 0 / 260px 260px; opacity: .09; filter: blur(5px);
+  transform-origin: 30% 0; animation: btSway 9s ease-in-out infinite alternate;
+}
+@keyframes btSway { from { transform: rotate(-2deg) translate(-1%, 0); } to { transform: rotate(2deg) translate(1%, 1%); } }
+header h1 { color: #1F4A2E; }
+.category-title { color: #24583A; }
+.mi-price { color: #C2643C; font-weight: 700; }
+
+/* cover: an arched greenhouse window */
+.cover-border {
+  --cover-card: linear-gradient(180deg, rgba(255,255,255,.82), rgba(239,247,236,.78));
+  max-width: 340px; padding: 70px 26px 38px; border: 2px solid #2F6B45; border-radius: 180px 180px 16px 16px;
+  outline: 1px solid rgba(47,107,69,.35); outline-offset: 7px;
+  box-shadow: 0 34px 70px -34px rgba(31,51,38,.55), inset 0 -40px 60px -40px rgba(139,199,154,.6);
+}
+.cover-border::before {    /* window mullions */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(90deg, transparent calc(50% - 1px), rgba(47,107,69,.25) calc(50% - 1px), rgba(47,107,69,.25) calc(50% + 1px), transparent calc(50% + 1px));
+  -webkit-mask-image: linear-gradient(180deg, #000 0 34%, transparent 34%); mask-image: linear-gradient(180deg, #000 0 34%, transparent 34%);
+}
+.cover-cafe-name { font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: .3em; padding-left: .3em; text-transform: uppercase; color: #C2643C; margin-bottom: 8px; }
+.cover-menu-word { font-size: 60px; letter-spacing: 0; text-transform: none; color: #1F4A2E; margin-bottom: 12px; }
+.cover-illustration::before { animation: none; }
+.cover-meta .cover-hours { color: #24583A; }
+@media (prefers-reduced-motion: reduce) { html::after { animation: none; } }

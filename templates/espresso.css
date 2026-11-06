@@ -1,0 +1,50 @@
+/* templates/espresso.css — "Espresso Bar": a dark roastery at night — caramel lamplight, beans scattered on the
+   counter, steam curling off a latte with heart art on a kraft-paper cover. */
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Work+Sans:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #1A110C; --paper: #26190F; --ink: #F6EADB; --text-secondary: #C4AC94;
+  --olive: #C8874A; --olive-dark: #E8B27C; --olive-soft: #3A2618;
+  --terracotta: #E9C9A0; --border: rgba(233,201,160,.22); --danger: #FF9A8A; --placeholder-bg: #33221A;
+  --on-primary: #1A0E06; --on-accent: #1A0E06;
+  --toast-bg: #E9C9A0; --toast-fg: #1A0E06; --note-focus-bg: #2E1F15;
+  --search-tint: rgba(26,17,12,.6); --bar-solid: rgba(26,17,12,.94);
+
+  --font-head: 'Abril Fatface', serif; --font-body: 'Work Sans', sans-serif;
+  --font-cover: 'Abril Fatface', serif; --font-cover-sub: 'Work Sans', sans-serif; --font-item: 'Work Sans', sans-serif; --item-w: 600;
+
+  --bg-a: rgba(200,135,74,.42); --bg-b: rgba(92,52,26,.7); --bg-c: rgba(233,201,160,.18); --bg-d: rgba(120,66,32,.5); --bg-dur: 30s;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='84' viewBox='0 0 96 84'%3E%3Cg transform='translate(14 16) rotate(-30)'%3E%3Cellipse rx='5' ry='7' fill='%23C8874A'/%3E%3Cpath d='M0 -6.4 C-2.4 -2 2.4 2 0 6.4' stroke='%231A110C' stroke-width='1.2' fill='none'/%3E%3C/g%3E%3Cg transform='translate(52 30) rotate(25)'%3E%3Cellipse rx='5' ry='7' fill='%23C8874A'/%3E%3Cpath d='M0 -6.4 C-2.4 -2 2.4 2 0 6.4' stroke='%231A110C' stroke-width='1.2' fill='none'/%3E%3C/g%3E%3Cg transform='translate(30 58) rotate(70)'%3E%3Cellipse rx='5' ry='7' fill='%23C8874A'/%3E%3Cpath d='M0 -6.4 C-2.4 -2 2.4 2 0 6.4' stroke='%231A110C' stroke-width='1.2' fill='none'/%3E%3C/g%3E%3Cg transform='translate(68 66) rotate(-50)'%3E%3Cellipse rx='5' ry='7' fill='%23C8874A'/%3E%3Cpath d='M0 -6.4 C-2.4 -2 2.4 2 0 6.4' stroke='%231A110C' stroke-width='1.2' fill='none'/%3E%3C/g%3E%3Cg transform='translate(84 20) rotate(10)'%3E%3Cellipse rx='5' ry='7' fill='%23C8874A'/%3E%3Cpath d='M0 -6.4 C-2.4 -2 2.4 2 0 6.4' stroke='%231A110C' stroke-width='1.2' fill='none'/%3E%3C/g%3E%3C/svg%3E"); --pattern-size: 96px; --pattern-o: .09;
+  --glass: rgba(38,25,15,.74); --glass-line: rgba(233,201,160,.22); --glass-blur: 8px;
+  --btn-bg: linear-gradient(180deg, #E8B27C, #C8874A 55%, #A5692F);
+  --btn-shadow: 0 10px 22px -10px rgba(200,135,74,.75), inset 0 1px 0 rgba(255,255,255,.3);
+  --rule: linear-gradient(90deg, #C8874A, rgba(200,135,74,.25) 60%, transparent);
+  --glow: #C8874A; --shadow-soft: 0 14px 30px -20px rgba(0,0,0,.9);
+  --item-r: 12px; --photo-r: 8px; --search-r: 999px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cellipse cx='12' cy='12' rx='7' ry='9.5' transform='rotate(30 12 12)' fill='%23C8874A'/%3E%3Cpath d='M8.8 4.8 C6.8 10 15.6 13.6 15.2 19.4' stroke='%231A110C' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 104'%3E %3Cstyle%3E@keyframes s%7B0%25%7Bstroke-dashoffset:40;opacity:0%7D35%25%7Bopacity:.85%7D100%25%7Bstroke-dashoffset:0;opacity:0%7D%7D.st%7Bstroke-dasharray:40;animation:s 3.2s ease-in-out infinite%7D.b%7Banimation-delay:1s%7D.c%7Banimation-delay:2s%7D%3C/style%3E %3Cg fill='none' stroke='%236B4A33' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath class='st' d='M48 26 C42 19 54 14 48 4'/%3E%3Cpath class='st b' d='M60 24 C54 17 66 12 60 2'/%3E%3Cpath class='st c' d='M72 26 C66 19 78 14 72 4'/%3E%3C/g%3E %3Cellipse cx='60' cy='92' rx='50' ry='9' fill='%236B4A33' opacity='.25'/%3E %3Cellipse cx='60' cy='88' rx='46' ry='9' fill='%23F3E3CC' stroke='%236B4A33' stroke-width='2'/%3E %3Cpath d='M98 56 C112 54 112 76 96 76' fill='none' stroke='%23F3E3CC' stroke-width='6'/%3E %3Cpath d='M98 56 C112 54 112 76 96 76' fill='none' stroke='%236B4A33' stroke-width='2' /%3E %3Cpath d='M22 44 H98 V58 C98 76 82 86 60 86 C38 86 22 76 22 58 Z' fill='%23F3E3CC' stroke='%236B4A33' stroke-width='2.2'/%3E %3Cellipse cx='60' cy='44' rx='38' ry='8' fill='%238A5A33' stroke='%236B4A33' stroke-width='2'/%3E %3Cpath d='M60 50 C52 43 48 40 52 37 C55 35 58 37 60 40 C62 37 65 35 68 37 C72 40 68 43 60 50 Z' fill='%23F3E3CC'/%3E %3C/svg%3E"); --emblem-w: 126px; --emblem-h: 108px;
+  --head-w: 400; --h1-size: 34px; --h1-ls: .01em; --cat-tt: none; --cat-ls: .01em; --cat-size: 25px;
+}
+/* the pendant lamp over the counter — a warm pool of light that breathes */
+html::before {
+  content: ""; position: fixed; left: 50%; top: -30vh; width: 120vmax; height: 90vh; margin-left: -60vmax; z-index: -2; pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 30%, rgba(255,190,120,.30), transparent 70%); animation: esLamp 7s ease-in-out infinite;
+}
+@keyframes esLamp { 0%, 100% { opacity: .8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
+header h1 { color: #F6EADB; text-shadow: 0 2px 20px rgba(232,178,124,.3); }
+.category-title { color: #F2D7B4; }
+.mi-price { font-weight: 700; }
+.menu-item { border-top: 1px solid rgba(233,201,160,.3); }
+
+/* cover: a kraft-paper card, stitched like a coffee-bag label */
+.cover-border {
+  --cover-card: linear-gradient(180deg, #D8B587, #C59B68);
+  max-width: 340px; padding: 40px 26px 34px; border-radius: 6px; -webkit-backdrop-filter: none; backdrop-filter: none;
+  outline: 1.5px dashed rgba(60,36,20,.55); outline-offset: -11px;
+  box-shadow: 0 34px 80px -30px #000, 0 0 90px -30px rgba(232,178,124,.6), inset 0 0 50px rgba(110,70,30,.35);
+}
+.cover-cafe-name { font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: .32em; padding-left: .32em; text-transform: uppercase; color: #5A2F14; margin-bottom: 8px; }
+.cover-menu-word { font-size: 62px; letter-spacing: .01em; text-transform: none; color: #2A170B; margin-bottom: 12px; }
+.cover-illustration { margin-bottom: 14px; }
+.cover-meta { color: #4A2E1A; font-weight: 500; }
+.cover-meta .cover-hours { color: #2A170B; font-weight: 700; }

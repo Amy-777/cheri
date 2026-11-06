@@ -1,0 +1,57 @@
+/* templates/diwali.css — "Diwali Lights" (seasonal): a festival night — fairy lights twinkling along the top,
+   a marigold toran over the cover, a diya whose flame really flickers, rangoli underfoot and sparks in the air. */
+@import url('https://fonts.googleapis.com/css2?family=Yatra+One&family=Mukta:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #12081F; --paper: #1E0F33; --ink: #FFF3DC; --text-secondary: #D7BFA6;
+  --olive: #FF9F1C; --olive-dark: #FFC75F; --olive-soft: #2D1747;
+  --terracotta: #FFB347; --border: rgba(255,179,71,.26); --danger: #FF9A8A; --placeholder-bg: #2A1645;
+  --on-primary: #1C0A00; --on-accent: #1C0A00;
+  --toast-bg: #FFC75F; --toast-fg: #1C0A00; --note-focus-bg: #26123F;
+  --search-tint: rgba(18,8,31,.6); --bar-solid: rgba(18,8,31,.94);
+
+  --font-head: 'Yatra One', serif; --font-body: 'Mukta', sans-serif;
+  --font-cover: 'Yatra One', serif; --font-cover-sub: 'Mukta', sans-serif; --font-item: 'Mukta', sans-serif; --item-w: 700;
+
+  --bg-a: rgba(255,140,30,.34); --bg-b: rgba(120,30,140,.62); --bg-c: rgba(255,200,90,.22); --bg-d: rgba(200,40,90,.36); --bg-dur: 26s;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Cg fill='none' stroke='%23FFB347' stroke-width='.9'%3E %3Cpath d='M35 12 C42 22 42 26 35 35 C28 26 28 22 35 12 Z'/%3E%3Cpath d='M35 58 C42 48 42 44 35 35 C28 44 28 48 35 58 Z'/%3E%3Cpath d='M12 35 C22 28 26 28 35 35 C26 42 22 42 12 35 Z'/%3E%3Cpath d='M58 35 C48 28 44 28 35 35 C44 42 48 42 58 35 Z'/%3E %3Ccircle cx='35' cy='35' r='3'/%3E%3C/g%3E%3Cg fill='%23FFB347'%3E%3Ccircle cx='0' cy='0' r='1.6'/%3E%3Ccircle cx='70' cy='0' r='1.6'/%3E%3Ccircle cx='0' cy='70' r='1.6'/%3E%3Ccircle cx='70' cy='70' r='1.6'/%3E%3C/g%3E%3C/svg%3E"); --pattern-size: 70px; --pattern-o: .08;
+  --glass: rgba(30,15,51,.72); --glass-line: rgba(255,179,71,.28); --glass-blur: 10px;
+  --btn-bg: linear-gradient(180deg, #FFD27A, #FF9F1C 55%, #E2780C);
+  --btn-shadow: 0 8px 22px -8px rgba(255,159,28,.75), inset 0 1px 0 rgba(255,255,255,.45);
+  --rule: linear-gradient(90deg, transparent, #FFB347 20%, #FFE08A 50%, #FFB347 80%, transparent);
+  --glow: #FFB347; --shadow-soft: 0 14px 30px -20px rgba(0,0,0,.85);
+  --item-r: 16px; --photo-r: 12px; --search-r: 24px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 C14.4 5.6 14.4 8.6 12 11 C9.6 8.6 9.6 5.6 12 2 Z' fill='%23FFC75F'/%3E%3Cpath d='M3 12.5 C7 13.6 17 13.6 21 12.5 C20.4 17 16.8 20 12 20 C7.2 20 3.6 17 3 12.5 Z' fill='%23E2783A'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 104'%3E %3Cdefs%3E%3CradialGradient id='h' cx='50%25' cy='60%25' r='50%25'%3E%3Cstop offset='0' stop-color='%23FFE6A0' stop-opacity='.9'/%3E%3Cstop offset='1' stop-color='%23FF9F1C' stop-opacity='0'/%3E%3C/radialGradient%3E %3ClinearGradient id='f' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23FFF6C8'/%3E%3Cstop offset='.5' stop-color='%23FFC75F'/%3E%3Cstop offset='1' stop-color='%23FF7A1C'/%3E%3C/linearGradient%3E %3ClinearGradient id='c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23E2783A'/%3E%3Cstop offset='1' stop-color='%239C3F18'/%3E%3C/linearGradient%3E %3Cstyle%3E@keyframes k%7B0%25,100%25%7Btransform:scale(1,1) rotate(-2deg)%7D30%25%7Btransform:scale(.92,1.08) rotate(3deg)%7D60%25%7Btransform:scale(1.05,.94) rotate(-1deg)%7D%7D.fl%7Btransform-origin:60px 52px;animation:k 1.3s ease-in-out infinite%7D@keyframes g%7B0%25,100%25%7Bopacity:.75%7D50%25%7Bopacity:1%7D%7D.ha%7Banimation:g 1.6s ease-in-out infinite%7D%3C/style%3E%3C/defs%3E %3Ccircle class='ha' cx='60' cy='36' r='34' fill='url(%23h)'/%3E %3Cpath class='fl' d='M60 10 C70 26 70 40 60 52 C50 40 50 26 60 10 Z' fill='url(%23f)'/%3E %3Cpath d='M14 56 C26 54 44 58 60 58 C76 58 94 54 106 56 C104 76 86 90 60 90 C34 90 16 76 14 56 Z' fill='url(%23c)'/%3E %3Cpath d='M24 66 C40 72 80 72 96 66' stroke='%23FFC75F' stroke-width='2' fill='none' opacity='.8'/%3E %3Cg fill='%23FFC75F'%3E%3Ccircle cx='38' cy='78' r='2'/%3E%3Ccircle cx='60' cy='81' r='2.2'/%3E%3Ccircle cx='82' cy='78' r='2'/%3E%3C/g%3E %3Cellipse cx='60' cy='96' rx='40' ry='4' fill='%23FF9F1C' opacity='.35'/%3E%3C/svg%3E"); --emblem-w: 124px; --emblem-h: 108px;
+  --head-w: 400; --h1-size: 34px; --h1-ls: .02em; --cat-tt: none; --cat-ls: .02em; --cat-size: 24px;
+}
+/* fairy lights strung across the top of the screen: two strands twinkling out of step */
+html::before, html::after {
+  content: ""; position: fixed; left: 0; right: 0; height: 30px; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle, #FFE08A 0 2.4px, rgba(255,200,90,.55) 3px, transparent 9px) 0 0 / 34px 30px repeat-x;
+}
+html::before { top: 2px; animation: dwTwinkle 1.8s ease-in-out infinite; }
+html::after { top: 2px; background-position: 17px 8px; background-image: radial-gradient(circle, #FF8FB0 0 2.2px, rgba(255,120,160,.5) 3px, transparent 9px); animation: dwTwinkle 1.8s ease-in-out -0.9s infinite; }
+@keyframes dwTwinkle { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+header { padding-top: 30px; }
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #E2780C 0%, #FFE9A8 35%, #FFB347 52%, #FFE9A8 70%, #E2780C 100%); background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: txShine 6s linear infinite;
+}
+.category-title { color: #FFD9A0; }
+.menu-item.priority { box-shadow: 0 0 30px -8px rgba(255,159,28,.7), var(--shadow-soft); }
+
+/* cover: a marigold toran hung across the top of a festive card */
+.cover-border {
+  --cover-card: linear-gradient(180deg, rgba(44,20,70,.82), rgba(24,10,40,.76));
+  max-width: 356px; padding: 64px 26px 40px; border: 1.5px solid #FFB347; border-radius: 20px;
+  outline: 1px dashed rgba(255,179,71,.45); outline-offset: 7px;
+  box-shadow: 0 34px 80px -30px #000, 0 0 80px -20px rgba(255,159,28,.5);
+}
+.cover-border::before { content: ""; position: absolute; left: 10px; right: 10px; top: 6px; height: 40px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 6 Q20 20 40 6 Q60 20 80 6' stroke='%232E7D32' stroke-width='2' fill='none'/%3E%3Ccircle cx='10' cy='12' r='7' fill='%23FF8C1A'/%3E%3Ccircle cx='10' cy='12' r='2.2' fill='%23FFE08A'/%3E%3Ccircle cx='30' cy='16' r='7' fill='%23FFB000'/%3E%3Ccircle cx='30' cy='16' r='2.2' fill='%23FFE08A'/%3E%3Ccircle cx='50' cy='12' r='7' fill='%23FF8C1A'/%3E%3Ccircle cx='50' cy='12' r='2.2' fill='%23FFE08A'/%3E%3Ccircle cx='70' cy='16' r='7' fill='%23FFB000'/%3E%3Ccircle cx='70' cy='16' r='2.2' fill='%23FFE08A'/%3E%3Cpath d='M20 20 L24 34 L28 20 Z M60 20 L64 34 L68 20 Z' fill='%2343A047'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 40px; }
+.cover-cafe-name { font-style: normal; font-weight: 600; font-size: 13px; letter-spacing: .26em; padding-left: .26em; text-transform: uppercase; color: #FFC75F; margin-bottom: 6px; }
+.cover-menu-word { font-size: 58px; letter-spacing: .02em; text-transform: none; margin-bottom: 10px; }
+.cover-menu-word::after { content: "शुभ दीपावली"; display: block; font-size: 17px; letter-spacing: .08em; margin-top: 2px; }
+.cover-illustration::before { animation: none; }
+.cover-meta .cover-hours { color: #FFC75F; }
+@media (prefers-reduced-motion: reduce) { html::before, html::after { animation: none; } }

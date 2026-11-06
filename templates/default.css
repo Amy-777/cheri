@@ -1,0 +1,409 @@
+:root {
+    /* ---- Editorial premium palette (replaces the old pink/teal set) ---- */
+    --cream: #F6F2E9;         /* page background — warm ivory */
+    --paper: #FFFDF8;         /* card surfaces — soft off-white */
+    --ink: #23241E;           /* near-black charcoal text */
+    --text-secondary: #7B7563;
+    --olive: #4E5A34;         /* primary action */
+    --olive-dark: #3B4526;
+    --olive-soft: #E7E9DC;
+    --terracotta: #B96A45;    /* restrained accent */
+    --border: #E7E0D1;        /* warm beige border */
+    --danger: #A8412C;
+    --placeholder-bg: #EDE7D8;
+
+    /* ---- Theme hooks (a template skin only has to override these) ---- */
+    --font-head: 'Cormorant Garamond', serif;   /* headings, category titles, cover */
+    --font-body: 'Inter', sans-serif;           /* everything else */
+    --on-primary: #fff;                          /* text on --olive buttons */
+    --on-accent: #fff;                           /* text on --terracotta badges */
+    --toast-bg: var(--ink);
+    --toast-fg: #fff;
+    --note-focus-bg: #fff;
+    --search-bg: var(--cream);                   /* sticky search strip */
+    --bar-solid: var(--cream);                   /* fade colour behind the bottom bar */
+    --cover-bg: var(--cream);                    /* full-screen colour behind the title card */
+
+    /* Hidden-menu accent — fixed on purpose (not theme-overridable), so an item from the secret
+       menu reads the same way in the cart no matter which of the 11 themes the cafe is using. */
+    --hm-navy: #121A33; --hm-navy-hi: #1E2C52; --hm-gold: #D8AE47; --hm-gold-hi: #F0CF7A;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+  body {
+    margin: 0; font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing: antialiased;
+    background: var(--cream); min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+  .serif { font-family: var(--font-head); }
+
+  /* ---- Header ---- */
+  header { padding: 22px 20px 16px; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .header-mark {
+    width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0;
+    border: 1px solid var(--border); background: var(--paper); display: flex; align-items: center; justify-content: center; color: var(--olive);
+  }
+  .bell-btn {
+    all: unset; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--ink); color: var(--ink);
+    display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0;
+  }
+  .bell-btn:active { background: var(--olive-soft); }
+  .bell-badge {
+    position: absolute; top: -2px; right: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--terracotta);
+    border: 1.5px solid var(--cream); display: none;
+  }
+  .bell-badge.show { display: block; animation: badgePop .5s ease; }
+  @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+
+  .header-center { text-align: center; }
+  header h1 { font-family: var(--font-head); font-weight: 600; font-size: 30px; margin: 0; letter-spacing: .01em; }
+  .header-subtitle { font-size: 10.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--text-secondary); margin: 4px 0 12px; }
+  .table-chip {
+    display: inline-block; background: transparent; border: 1px solid var(--ink); color: var(--ink);
+    font-size: 11px; font-weight: 600; letter-spacing: .04em; padding: 5px 14px; border-radius: 20px;
+  }
+
+  /* ---- Search ---- */
+  .search-wrap { position: sticky; top: 0; z-index: 20; background: var(--search-bg); padding: 4px 20px 14px; }
+  .search-box {
+    display: flex; align-items: center; gap: 9px; background: var(--paper); border: 1px solid var(--border);
+    border-radius: 24px; padding: 10px 14px; color: var(--text-secondary);
+  }
+  .search-box svg { flex-shrink: 0; }
+  .search-box input {
+    all: unset; flex: 1; font-family: var(--font-body); font-size: 14px; color: var(--ink); min-width: 0;
+  }
+  .search-box input::placeholder { color: var(--text-secondary); }
+  .search-clear { all: unset; display: none; cursor: pointer; color: var(--text-secondary); flex-shrink: 0; padding: 2px; }
+  .search-clear.show { display: flex; }
+
+  .status-banner {
+    margin: 0 20px 16px; padding: 11px 14px; background: var(--olive-soft); color: var(--olive-dark);
+    font-size: 13px; border-radius: 10px; text-align: center; font-weight: 600; border: 1px solid var(--border);
+  }
+
+  /* ---- Menu ---- */
+  .menu-wrap { padding: 0 20px; }
+  .category-block { margin-bottom: 30px; }
+  .category-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+  .category-icon { color: var(--olive); display: flex; flex-shrink: 0; }
+  .category-title {
+    font-family: var(--font-head); font-weight: 600; font-size: 21px; letter-spacing: .06em;
+    text-transform: uppercase; margin: 0;
+  }
+  .category-title.priority-title { color: var(--terracotta); }
+  .category-rule { height: 1px; background: var(--border); margin: 10px 0 14px; }
+
+  .menu-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .category-items .menu-item:last-child { border-bottom: none; }
+  .menu-item.priority { position: relative; }
+
+  .mi-photo {
+    width: 76px; height: 76px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border);
+    flex-shrink: 0; background: var(--placeholder-bg);
+  }
+  .mi-photo-placeholder {
+    width: 76px; height: 76px; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0;
+    background: var(--placeholder-bg); display: flex; align-items: center; justify-content: center; color: #B9AE8F;
+  }
+
+  .mi-info { flex: 1; min-width: 0; padding-top: 1px; }
+  .priority-badge {
+    display: inline-block; background: var(--terracotta); color: var(--on-accent); font-size: 9.5px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px; margin-bottom: 5px; letter-spacing: .05em; text-transform: uppercase;
+  }
+  .mi-top-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .mi-name { font-weight: 600; font-size: 15px; margin: 0; line-height: 1.3; }
+  .mi-unit { font-size: 11px; color: var(--text-secondary); font-weight: 400; }
+  .mi-price { font-size: 14px; font-weight: 700; color: var(--olive-dark); flex-shrink: 0; white-space: nowrap; }
+  .mi-desc {
+    font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 0; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .qty-control { display: flex; align-items: center; gap: 8px; flex-shrink: 0; align-self: center; padding-top: 1px; }
+  .qty-btn {
+    all: unset; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: 1.5px solid var(--ink); color: var(--ink); transition: transform .12s ease, background .15s ease;
+  }
+  .qty-btn:active { transform: scale(.9); background: var(--olive-soft); }
+  .qty-btn.primary { background: var(--olive); border-color: var(--olive); color: var(--on-primary); }
+  .qty-btn.primary:active { background: var(--olive-dark); }
+  .qty-num { font-weight: 700; min-width: 14px; text-align: center; font-size: 14px; }
+
+  .empty-note { text-align: center; color: var(--text-secondary); font-size: 13.5px; padding: 40px 20px; }
+  .no-results { text-align: center; color: var(--text-secondary); font-size: 13.5px; padding: 40px 20px; }
+  .no-results svg { margin-bottom: 10px; color: var(--border); }
+
+  /* ---- Bottom action bar: Call Waiter + View Cart, always both visible ---- */
+  .bottom-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(0deg, var(--bar-solid) 55%, transparent);
+  }
+  .pill-btn {
+    all: unset; box-sizing: border-box; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    height: 50px; border-radius: 26px; font-family: var(--font-body); font-weight: 600; font-size: 13.5px;
+    cursor: pointer; transition: transform .12s ease, background .15s ease, opacity .15s ease; text-align: center;
+  }
+  .pill-btn:active { transform: scale(.97); }
+  .call-pill {
+    border: 1.5px solid var(--ink); color: var(--ink); background: var(--paper); flex: 0.85;
+  }
+  .call-pill.sent { border-color: var(--olive); color: var(--olive-dark); background: var(--olive-soft); }
+  .cart-pill {
+    background: var(--olive); color: var(--on-primary); flex: 1.15; position: relative;
+  }
+  .cart-pill:active { background: var(--olive-dark); }
+  .cart-badge {
+    background: rgba(255,255,255,.22); font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  }
+
+  /* ---- Sheets (cart + notifications) ---- */
+  .sheet-backdrop { position: fixed; inset: 0; background: rgba(35,36,30,.42); display: none; align-items: flex-end; z-index: 50; }
+  .sheet-backdrop.show { display: flex; }
+  .sheet {
+    background: var(--paper); width: 100%; border-radius: 22px 22px 0 0; padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+    max-height: 82vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    transform: translateY(100%); transition: transform .28s cubic-bezier(.32,.72,0,1);
+  }
+  .sheet-backdrop.show .sheet { transform: translateY(0); }
+  .sheet-handle { width: 36px; height: 4px; border-radius: 4px; background: var(--border); margin: 6px auto 14px; }
+  .sheet h2 { font-family: var(--font-head); font-weight: 600; font-size: 22px; margin: 0 0 14px; }
+
+  .cart-line { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .cart-line-info { flex: 1; min-width: 0; }
+  .cart-line-name { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+  .cart-line-price { font-size: 12.5px; color: var(--text-secondary); }
+  .cart-line-total { font-size: 14px; font-weight: 700; width: 56px; text-align: right; flex-shrink: 0; }
+
+  .sheet-empty { text-align: center; color: var(--text-secondary); font-size: 13.5px; padding: 30px 10px; }
+  .sheet-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; padding: 16px 0 6px; }
+  .note-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin: 12px 0 6px; }
+  .note-input {
+    width: 100%; font-family: var(--font-body); font-size: 13.5px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--cream); color: var(--ink); resize: vertical;
+  }
+  .note-input:focus { outline: 2px solid var(--olive); outline-offset: 1px; background: var(--note-focus-bg); }
+  .place-order-btn {
+    all: unset; display: block; box-sizing: border-box; width: 100%; text-align: center; background: var(--olive);
+    color: var(--on-primary); font-weight: 700; font-size: 15px; padding: 15px; border-radius: 14px; cursor: pointer; margin-top: 14px;
+  }
+  .place-order-btn:disabled { opacity: .5; }
+  .close-sheet { all: unset; display: block; margin-left: auto; color: var(--text-secondary); cursor: pointer; padding: 4px; }
+  .sheet-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+  /* Notification sheet */
+  .notif-item { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); margin-top: 6px; flex-shrink: 0; }
+  .notif-item.read .notif-dot { background: var(--border); }
+  .notif-title { font-size: 13.5px; font-weight: 600; margin: 0 0 2px; }
+  .notif-msg { font-size: 12.5px; color: var(--text-secondary); margin: 0; }
+  .notif-time { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
+  .toast {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--toast-bg); color: var(--toast-fg);
+    padding: 11px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: all .2s ease; pointer-events: none;
+    z-index: 60; max-width: 85%; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .loading, .error-state { text-align: center; padding: 60px 24px; color: var(--text-secondary); font-size: 14px; }
+  /* ==== Cover / flip-in title card (shown once per load, then flips to
+     the swipeable menu behind it). Uses the same tokens as the rest of the
+     menu — --cream, --ink, --terracotta, --olive, Cormorant Garamond —
+     so it stays in sync with whatever template a cafe has chosen. ==== */
+  .flip-stage { width: 100%; }
+  .flipper {
+    position: relative; min-height: 100vh; width: 100%;
+    transform-style: preserve-3d; transition: transform .55s cubic-bezier(.62,.09,.29,1.01);
+  }
+  .flipper.flipped { transform: rotateY(180deg); }
+  .cover-face, .app-face {
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    min-height: 100vh;
+  }
+  .cover-face { position: relative; z-index: 2; }
+  .app-face { position: absolute; inset: 0; transform: rotateY(180deg); overflow: hidden; z-index: 1; }
+  .flipper.flipped .app-face { position: relative; overflow: visible; }
+  .flipper.flipped .cover-face { position: absolute; inset: 0; pointer-events: none; }
+  /* Once the flip has finished, the flipper's and the app face's 180° rotations cancel out. Dropping both
+     changes nothing visually, but a transformed ancestor traps position:fixed children (bottom bar, sheets,
+     nav dots) — without this they end up at the bottom of the *page*, not the screen. */
+  .flipper.settled { transform: none; transition: none; transform-style: flat; }
+  .flipper.settled .app-face { transform: none; }
+  .flipper.settled .cover-face { display: none; }
+
+  .cover-face {
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px; background: var(--cover-bg);
+    opacity: 0; transition: opacity .5s ease;
+  }
+  .cover-face.show { opacity: 1; }
+  .cover-border {
+    width: 100%; max-width: 400px; border: 1.5px solid var(--ink);
+    padding: 36px 26px; text-align: center; position: relative;
+  }
+  .cover-cafe-name {
+    font-family: var(--font-head); font-style: italic; font-weight: 600;
+    font-size: 17px; letter-spacing: .04em; color: var(--terracotta); margin-bottom: 6px;
+  }
+  .cover-menu-word {
+    font-family: var(--font-head); font-weight: 700; text-transform: uppercase;
+    font-size: 52px; letter-spacing: .06em; margin: 0 0 24px; color: var(--ink); line-height: 1;
+  }
+  .cover-illustration { color: var(--ink); margin: 0 auto 24px; width: 116px; }
+  .cover-illustration svg { width: 100%; height: auto; display: block; margin: 0 auto; }
+  .cover-meta { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; min-height: 1em; }
+  .cover-meta .cover-hours { font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+
+  /* ==== Swipeable carousel: Order (left) — Menu (center, default) — About (right) ==== */
+  .carousel { overflow: hidden; width: 100%; }
+  .carousel-track { display: flex; width: 300%; will-change: transform; }
+  .carousel-track:not(.dragging) { transition: transform .32s cubic-bezier(.22,.9,.32,1.05); }
+  .carousel-panel { width: 33.3333%; flex-shrink: 0; min-height: 100vh; overflow-y: auto; padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+  .panel-nav-dots {
+    position: fixed; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 31;
+    display: flex; justify-content: center; gap: 6px; pointer-events: none;
+  }
+  .panel-nav-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background .2s ease, transform .2s ease; pointer-events: auto; cursor: pointer; }
+  .panel-nav-dots span.active { background: var(--olive); transform: scale(1.3); }
+
+  .side-page { padding: 30px 20px 20px; max-width: 480px; margin: 0 auto; }
+  .side-page-title { font-family: var(--font-head); font-weight: 600; font-size: 26px; margin: 0 0 4px; }
+  .side-page-sub { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 22px; }
+
+  /* About panel */
+  .about-block { margin-bottom: 22px; }
+  .about-label { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 6px; }
+  .about-text { font-size: 14px; line-height: 1.7; color: var(--ink); }
+  .about-empty { font-size: 13.5px; color: var(--text-secondary); font-style: italic; }
+  .about-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .about-gallery-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+
+  /* Order panel */
+  .order-page-lines { margin-bottom: 10px; }
+  .order-page-total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--font-head); font-size: 22px; font-weight: 600;
+    padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 10px 0 22px;
+  }
+  .order-qr-wrap { text-align: center; padding: 22px; border: 1px dashed var(--border); border-radius: 14px; margin-top: 24px; }
+  .order-qr-wrap img { width: 168px; height: 168px; object-fit: contain; margin: 0 auto 12px; border-radius: 8px; border: 1px solid var(--border); }
+  .order-qr-note { font-size: 12px; color: var(--text-secondary); }
+  .order-empty { text-align: center; color: var(--text-secondary); font-size: 13.5px; padding: 40px 20px; }
+
+  /* A cart line for an item that came from the hidden menu — same navy/gold everywhere, any theme. */
+  .cart-line.cart-line-hidden, .menu-item.hm-item {
+    background: linear-gradient(100deg, var(--hm-navy), var(--hm-navy-hi));
+    border: 1px solid var(--hm-gold); border-radius: 10px; padding: 10px 12px; margin: 0 0 8px;
+    box-shadow: 0 6px 18px -10px rgba(0,0,0,.6);
+  }
+  .cart-line.cart-line-hidden .cart-line-name, .cart-line.cart-line-hidden .cart-line-total,
+  .cart-line.cart-line-hidden .qty-num { color: var(--hm-gold-hi); }
+  .cart-line.cart-line-hidden .cart-line-price { color: #C9B98A; }
+  .cart-line.cart-line-hidden .qty-btn { border-color: var(--hm-gold); color: var(--hm-gold-hi); }
+  .cart-line.cart-line-hidden .qty-btn.primary { background: var(--hm-gold); color: var(--hm-navy); border-color: var(--hm-gold); }
+  .cart-line-hidden-tag {
+    display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--hm-navy); background: var(--hm-gold); padding: 2px 7px; border-radius: 20px; margin-bottom: 4px;
+  }
+  .cart-pill.has-hidden-item::after {
+    content: ''; position: absolute; top: -3px; right: -3px; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--hm-gold); border: 1.5px solid var(--cream); box-shadow: 0 0 6px var(--hm-gold);
+  }
+
+  /* ==== Hidden / secret menu ==========================================================
+     Pull down from the top of the menu (past the threshold) to reveal it. It's built to be
+     a *darker sibling* of whatever theme is active, not a 12th bespoke theme: the ambient
+     backdrop every theme already paints (body/html ::before/::after, plus ThemeFX's own
+     canvas via its .tfx-bg hook) is simply dimmed with a CSS filter, and the reused
+     .menu-item / .category-title cards get the same treatment — so it stays theme-agnostic
+     as new themes are added, with no per-theme authoring needed here.
+     NOTE on privacy: this is a fun-discovery / traceability feature, not real security. See
+     .hm-watermark below and the delivery notes for what it does and does not protect against. */
+
+  html.hidden-menu-open body::before, html.hidden-menu-open body::after,
+  html.hidden-menu-open::before, html.hidden-menu-open::after,
+  html.hidden-menu-open canvas.tfx-bg {
+    filter: brightness(.4) saturate(1.3);
+    transition: filter .7s ease;
+  }
+
+  /* Pull-to-reveal indicator — fixed above the viewport, slides down as the person pulls. */
+  .hm-pull-indicator {
+    position: fixed; top: 0; left: 50%; z-index: 410; pointer-events: none;
+    transform: translate(-50%, -100%); opacity: 0; will-change: transform, opacity;
+    display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 22px 18px;
+    background: linear-gradient(180deg, var(--hm-navy), rgba(18,26,51,0));
+    border-radius: 0 0 22px 22px; color: var(--hm-gold-hi);
+  }
+  .hm-pull-indicator svg { width: 22px; height: 22px; transition: transform .2s ease; }
+  .hm-pull-indicator.committed svg { transform: rotate(180deg) scale(1.15); }
+  .hm-pull-indicator span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+
+  /* The panel itself — created once on first reveal, then just shown/hidden. */
+  .hidden-menu-panel {
+    position: fixed; inset: 0; z-index: 400; display: flex; flex-direction: column;
+    background:
+      radial-gradient(120% 70% at 50% -10%, rgba(216,174,71,.14), transparent 55%),
+      linear-gradient(180deg, #05070F 0%, #0A0E1C 45%, #05070F 100%);
+    opacity: 0; visibility: hidden; transform: scale(1.04);
+    transition: opacity .5s cubic-bezier(.2,.7,.3,1), transform .5s cubic-bezier(.2,.7,.3,1), visibility 0s linear .5s;
+    overflow: hidden;
+  }
+  .hidden-menu-panel.open { opacity: 1; visibility: visible; transform: scale(1); transition: opacity .5s cubic-bezier(.2,.7,.3,1), transform .5s cubic-bezier(.2,.7,.3,1); }
+  .hidden-menu-panel .hm-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 18px calc(100px + env(safe-area-inset-bottom)); }
+  .hidden-menu-panel .hm-scroll::-webkit-scrollbar { display: none; }
+
+  .hm-header { padding: calc(22px + env(safe-area-inset-top)) 18px 6px; text-align: center; position: relative; user-select: none; -webkit-user-select: none; }
+  .hm-close-btn {
+    all: unset; position: absolute; top: calc(18px + env(safe-area-inset-top)); right: 18px; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--hm-gold-hi);
+    background: rgba(255,255,255,.06); cursor: pointer;
+  }
+  .hm-lock-icon { width: 34px; height: 34px; color: var(--hm-gold); margin: 0 auto 10px; display: block; animation: hmFloat 3.2s ease-in-out infinite; }
+  @keyframes hmFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .hm-title {
+    font-family: var(--font-head); font-size: 26px; letter-spacing: .04em; margin: 0 0 4px;
+    background: linear-gradient(100deg, var(--hm-gold) 0%, #FFF3CE 35%, var(--hm-gold-hi) 50%, #FFF3CE 65%, var(--hm-gold) 100%);
+    background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    animation: hmShine 6s linear infinite;
+  }
+  @keyframes hmShine { to { background-position: -220% 0; } }
+  .hm-tagline { font-size: 12.5px; color: #9AA3C4; letter-spacing: .05em; margin: 0 0 18px; }
+
+  .hidden-menu-panel .category-block { margin-bottom: 22px; }
+  .hidden-menu-panel .category-title { filter: brightness(.7) saturate(1.15); }
+  .hidden-menu-panel .menu-item { filter: brightness(.62) saturate(1.15); border-color: var(--hm-gold); }
+  .hidden-menu-panel .menu-item:active { filter: brightness(.72) saturate(1.2); }
+  .hidden-menu-panel .priority-badge { background: var(--hm-gold); color: var(--hm-navy); }
+  .hm-empty { text-align: center; color: #7B84A6; font-size: 13.5px; padding: 60px 20px; }
+
+  /* Deterrent, not prevention (no website can block a phone's own screenshot function): makes
+     text/images harder to casually long-press-save, and stamps a faint, slowly-drifting
+     table + time mark across the screen so a leaked screenshot can be traced back. */
+  .hidden-menu-panel, .hidden-menu-panel * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .hm-watermark {
+    position: absolute; inset: -20% -20%; z-index: 1; pointer-events: none; overflow: hidden;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px 20px; align-content: space-evenly;
+    transform: rotate(-22deg); animation: hmDrift 90s linear infinite;
+  }
+  .hm-watermark span { font-size: 11px; font-weight: 600; letter-spacing: .1em; color: rgba(216,174,71,.09); white-space: nowrap; text-align: center; }
+  @keyframes hmDrift { from { transform: rotate(-22deg) translateY(0); } to { transform: rotate(-22deg) translateY(-120px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hm-lock-icon, .hm-title, .hm-watermark { animation: none; }
+  }

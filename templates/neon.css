@@ -1,0 +1,72 @@
+/* templates/neon.css — "Neon Alley": a rain-slick city street after midnight. Magenta and cyan tubes buzz and
+   flicker, a synthwave grid rolls away under the horizon, and the menu word on the cover is a real neon sign. */
+@import url('https://fonts.googleapis.com/css2?family=Monoton&family=Bungee&family=Rajdhani:wght@500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #07060F; --paper: #120F22; --ink: #F4F1FF; --text-secondary: #A9A3C9;
+  --olive: #FF2E88; --olive-dark: #FF79B6; --olive-soft: #24183C;
+  --terracotta: #29E7FF; --border: rgba(41,231,255,.24); --danger: #FF8FA8; --placeholder-bg: #1C1631;
+  --on-primary: #12020B; --on-accent: #04121A;
+  --toast-bg: #29E7FF; --toast-fg: #04121A; --note-focus-bg: #1A1530;
+  --search-tint: rgba(7,6,15,.6); --bar-solid: rgba(7,6,15,.94);
+
+  --font-head: 'Bungee', sans-serif; --font-body: 'Rajdhani', sans-serif;
+  --font-cover: 'Monoton', cursive; --font-cover-sub: 'Bungee', sans-serif; --font-item: 'Rajdhani', sans-serif; --item-w: 700;
+
+  --bg-a: rgba(255,46,136,.42); --bg-b: rgba(41,231,255,.30); --bg-c: rgba(140,70,255,.42); --bg-d: rgba(20,20,110,.6); --bg-dur: 18s;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='1' fill='%23000'/%3E%3C/svg%3E"); --pattern-size: 4px; --pattern-o: .28;
+  --glass: rgba(18,15,34,.72); --glass-line: rgba(41,231,255,.26); --glass-blur: 10px;
+  --btn-bg: linear-gradient(120deg, #FF2E88, #FF5FA8 50%, #B57BFF);
+  --btn-shadow: 0 0 18px -2px rgba(255,46,136,.75), inset 0 1px 0 rgba(255,255,255,.35);
+  --rule: linear-gradient(90deg, #FF2E88, #29E7FF 60%, rgba(41,231,255,0));
+  --glow: #FF2E88; --shadow-soft: 0 0 0 1px rgba(41,231,255,.08), 0 14px 30px -20px rgba(0,0,0,.9);
+  --item-r: 6px; --photo-r: 4px; --search-r: 6px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5 2 L5 13.5 H11 L9.5 22 L19 9.5 H12.8 Z' fill='none' stroke='%2329E7FF' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3E %3Cdefs%3E%3Cfilter id='g' x='-40%25' y='-40%25' width='180%25' height='180%25'%3E%3CfeGaussianBlur stdDeviation='2.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E %3Cstyle%3E@keyframes f%7B0%25,100%25%7Bopacity:1%7D42%25%7Bopacity:1%7D44%25%7Bopacity:.25%7D46%25%7Bopacity:1%7D71%25%7Bopacity:.85%7D73%25%7Bopacity:.3%7D75%25%7Bopacity:1%7D%7D.fl%7Banimation:f 4.2s infinite%7D%3C/style%3E%3C/defs%3E %3Cg fill='none' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'%3E %3Cpath class='fl' d='M38 30 C34 22 44 18 40 10 M56 28 C52 20 62 16 58 6 M74 30 C70 22 80 18 76 10' stroke='%2329E7FF' stroke-width='3'/%3E %3Cpath d='M24 40 H92 V58 C92 76 78 88 58 88 C38 88 24 76 24 58 Z' stroke='%23FF2E88' stroke-width='3.6'/%3E %3Cpath d='M92 46 H100 C110 46 110 66 96 66' stroke='%23FF2E88' stroke-width='3.6'/%3E %3Cpath d='M14 94 H102' stroke='%23B57BFF' stroke-width='3'/%3E%3C/g%3E%3C/svg%3E"); --emblem-w: 118px; --emblem-h: 98px;
+  --head-w: 400; --h1-size: 30px; --h1-ls: .04em; --h1-tt: uppercase; --cat-size: 17px; --cat-ls: .12em;
+}
+/* the synthwave floor: a perspective grid rolling towards you under a glowing horizon */
+html::after {
+  content: ""; position: fixed; left: -50%; right: -50%; bottom: -10vh; height: 52vh; z-index: -2; pointer-events: none;
+  background:
+    linear-gradient(rgba(255,46,136,.55) 2px, transparent 2px) 0 0 / 100% 46px,
+    linear-gradient(90deg, rgba(41,231,255,.45) 2px, transparent 2px) 0 0 / 60px 100%;
+  transform: perspective(260px) rotateX(62deg); transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 45%); mask-image: linear-gradient(180deg, transparent, #000 45%);
+  animation: nzRoll 2.4s linear infinite; opacity: .55;
+}
+html::before {     /* horizon glow */
+  content: ""; position: fixed; left: 0; right: 0; bottom: 30vh; height: 2px; z-index: -2; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #FF2E88 30%, #29E7FF 70%, transparent); box-shadow: 0 0 40px 10px rgba(255,46,136,.35);
+}
+html:has(.flipper.settled)::after { opacity: .3; }
+@keyframes nzRoll { to { background-position: 0 46px, 0 0; } }
+@keyframes nzBuzz { 0%, 100% { opacity: 1; } 41% { opacity: 1; } 42% { opacity: .35; } 43% { opacity: 1; } 77% { opacity: .9; } 78% { opacity: .4; } 80% { opacity: 1; } }
+
+header h1 {
+  color: #FFE6F3; text-shadow: 0 0 4px #fff, 0 0 12px #FF2E88, 0 0 26px #FF2E88, 0 0 44px rgba(255,46,136,.6);
+  animation: nzBuzz 5s infinite;
+}
+.header-subtitle { color: #29E7FF; text-shadow: 0 0 10px rgba(41,231,255,.8); }
+.category-title { color: #E8FDFF; text-shadow: 0 0 10px rgba(41,231,255,.75); }
+.category-title.priority-title { color: #FFE6F3; text-shadow: 0 0 10px rgba(255,46,136,.85); }
+.menu-item { border-left: 2px solid #29E7FF; }
+.menu-item.priority { border-left-color: #FF2E88; box-shadow: 0 0 22px -6px rgba(255,46,136,.7), var(--shadow-soft); }
+.mi-name { font-size: 17px; letter-spacing: .02em; }
+.mi-price { text-shadow: 0 0 10px rgba(255,46,136,.55); }
+.cart-pill, .place-order-btn, .qty-btn.primary { color: #fff; }
+
+/* cover: a neon sign bolted to a brick-dark wall */
+.cover-border {
+  --cover-card: rgba(10,8,22,.78);
+  max-width: 356px; padding: 46px 26px 40px; border: 2px solid #FF2E88; border-radius: 26px;
+  box-shadow: 0 0 6px #FF2E88, 0 0 22px rgba(255,46,136,.7), inset 0 0 18px rgba(255,46,136,.45), 0 0 0 7px rgba(41,231,255,.08), 0 30px 80px -30px #000;
+}
+.cover-cafe-name { font-style: normal; font-size: 13px; letter-spacing: .3em; padding-left: .3em; text-transform: uppercase; color: #29E7FF; text-shadow: 0 0 10px rgba(41,231,255,.9); margin-bottom: 10px; }
+.cover-menu-word {
+  font-size: 56px; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 14px; color: #FFE6F3;
+  text-shadow: 0 0 4px #fff, 0 0 14px #FF2E88, 0 0 32px #FF2E88, 0 0 60px rgba(255,46,136,.7); animation: nzBuzz 4.2s infinite;
+}
+.cover-meta { color: #C9C2EE; letter-spacing: .04em; }
+.cover-meta .cover-hours { color: #29E7FF; text-shadow: 0 0 8px rgba(41,231,255,.7); }
+@media (prefers-reduced-motion: reduce) { html::after, header h1, .cover-menu-word { animation: none !important; } }

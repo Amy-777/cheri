@@ -1,0 +1,143 @@
+/* templates/theme-kit.css — shared design system behind the designer themes.
+ *
+ * Every designer theme @imports this file, then sets a handful of tokens (palette, fonts,
+ * backdrop colours, cover emblem). Loaded on top of default.css, so it only restyles; layout
+ * and behaviour stay in the shared engine.
+ *
+ * Tokens a theme sets (on :root):
+ *   default.css ones : --cream --paper --ink --text-secondary --olive --olive-dark --olive-soft
+ *                      --terracotta --border --danger --placeholder-bg --font-head --font-body
+ *                      --on-primary --on-accent --toast-bg --toast-fg --note-focus-bg
+ *                      --search-bg --bar-solid
+ *   kit ones         : --bg-a..--bg-d (backdrop glows) --bg-dur --pattern --pattern-size --pattern-o
+ *                      --glass --glass-line --glass-blur --btn-bg --btn-shadow --rule --glow
+ *                      --emblem --emblem-w --emblem-h --cover-card --cover-r
+ *                      --font-cover --font-cover-sub --font-item
+ *                      --glyph  (small 24×24 ornament that replaces the leaf: category headings + logo fallback)
+ *                      --item-bw (border width of menu cards, default 1px)
+ */
+
+/* ============ living backdrop ============ */
+html { background: var(--cream); }
+body { background: transparent; }
+
+body::before {                                    /* drifting colour glows */
+  content: ""; position: fixed; inset: -25%; z-index: -3; pointer-events: none;
+  background:
+    radial-gradient(38% 34% at 18% 18%, var(--bg-a, transparent) 0, transparent 100%),
+    radial-gradient(34% 38% at 86% 26%, var(--bg-b, transparent) 0, transparent 100%),
+    radial-gradient(44% 40% at 72% 86%, var(--bg-c, transparent) 0, transparent 100%),
+    radial-gradient(36% 36% at 12% 82%, var(--bg-d, transparent) 0, transparent 100%);
+  animation: txDrift var(--bg-dur, 26s) ease-in-out infinite alternate;
+  will-change: transform;
+}
+body::after {                                     /* fine pattern over the glows */
+  content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: var(--pattern, none); background-size: var(--pattern-size, 120px);
+  opacity: var(--pattern-o, .5);
+}
+@keyframes txDrift {
+  0%   { transform: translate3d(-3%, -2%, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(3%, 2%, 0) rotate(2.5deg) scale(1.07); }
+  100% { transform: translate3d(-2%, 3%, 0) rotate(-2.5deg) scale(1.03); }
+}
+@keyframes txCoverIn { from { opacity: 0; transform: translateY(18px) scale(.95); } to { opacity: 1; transform: none; } }
+@keyframes txShine { to { background-position: -220% 0; } }
+@keyframes txFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+::selection { background: var(--terracotta); color: var(--on-accent); }
+
+/* ============ the theme's own ornament instead of the stock leaf ============ */
+.category-icon svg, #cafe-logo-fallback svg { display: none; }
+.category-icon::before, #cafe-logo-fallback::before {
+  content: ""; display: block; background: var(--glyph, none) center / contain no-repeat;
+}
+.category-icon::before { width: 20px; height: 20px; }
+#cafe-logo-fallback::before { width: 26px; height: 26px; }
+
+/* ============ header + search ============ */
+header h1 {
+  font-size: var(--h1-size, 32px); font-weight: var(--head-w, 600); letter-spacing: var(--h1-ls, .02em);
+  text-transform: var(--h1-tt, none); color: var(--h1-color, var(--ink)); text-shadow: var(--h1-shadow, none);
+}
+.header-subtitle { color: var(--terracotta); letter-spacing: .28em; }
+.table-chip { background: var(--glass); border: 1px solid var(--terracotta); color: var(--ink); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.header-mark { background: var(--glass); border: 1px solid var(--terracotta); color: var(--terracotta); }
+.bell-btn { border-color: var(--terracotta); color: var(--ink); background: var(--glass); }
+.bell-btn:active { background: var(--olive-soft); }
+.bell-badge { border-color: var(--cream); }
+
+/* sticky search strip: tints the page behind it and fades out — no hard edge over the animated backdrop */
+.search-wrap { background: linear-gradient(180deg, transparent 0, var(--search-tint, transparent) 10px, var(--search-tint, transparent) 58%, transparent 100%); }
+.search-box {
+  background: var(--glass); border: 1px solid var(--glass-line); border-radius: var(--search-r, 26px);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 10px)); backdrop-filter: blur(var(--glass-blur, 10px));
+  box-shadow: var(--shadow-soft, none);
+}
+.search-box input { color: var(--ink); }
+.status-banner { background: var(--glass); color: var(--ink); border-color: var(--glass-line); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+/* ============ menu ============ */
+.category-block { margin-bottom: 26px; }
+.category-title {
+  font-weight: var(--head-w, 600); font-size: var(--cat-size, 21px); letter-spacing: var(--cat-ls, .1em);
+  text-transform: var(--cat-tt, uppercase); color: var(--cat-color, var(--ink));
+}
+.category-title.priority-title { color: var(--terracotta); }
+.category-icon { color: var(--terracotta); }
+.category-rule { height: 1px; border: 0; background: var(--rule, linear-gradient(90deg, var(--terracotta), transparent)); }
+
+.menu-item {
+  background: var(--glass); border: var(--item-bw, 1px) solid var(--glass-line); border-radius: var(--item-r, 18px);
+  padding: 13px; margin-bottom: 12px; box-shadow: var(--shadow-soft, none);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 10px)); backdrop-filter: blur(var(--glass-blur, 10px));
+}
+.category-items .menu-item:last-child { border-bottom: var(--item-bw, 1px) solid var(--glass-line); }
+.menu-item.priority { border-color: var(--terracotta); box-shadow: 0 0 26px -10px var(--glow, var(--terracotta)), var(--shadow-soft, none); }
+.mi-photo, .mi-photo-placeholder { border-radius: var(--photo-r, 14px); border: 1px solid var(--glass-line); }
+.mi-photo-placeholder { background: var(--placeholder-bg); color: var(--text-secondary); }
+.mi-name { font-family: var(--font-item, var(--font-body)); font-weight: var(--item-w, 700); letter-spacing: var(--item-ls, 0); color: var(--ink); }
+.mi-unit, .mi-desc { color: var(--text-secondary); }
+.mi-unit { white-space: nowrap; }
+.mi-price { color: var(--olive-dark); font-family: var(--font-price, var(--font-body)); }
+.priority-badge { background: var(--terracotta); color: var(--on-accent); }
+
+/* ============ buttons ============ */
+.qty-btn { border-color: var(--terracotta); color: var(--ink); }
+.qty-btn:active { background: var(--olive-soft); }
+.qty-btn.primary, .cart-pill, .place-order-btn {
+  background: var(--btn-bg, var(--olive)); color: var(--on-primary); box-shadow: var(--btn-shadow, none);
+}
+.qty-btn.primary { border-color: transparent; }
+.cart-pill:active, .qty-btn.primary:active { filter: brightness(.92); background: var(--btn-bg, var(--olive)); }
+.call-pill { background: var(--glass); border-color: var(--terracotta); color: var(--ink); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.call-pill.sent { background: var(--olive-soft); border-color: var(--olive-dark); color: var(--olive-dark); }
+.cart-badge { background: rgba(0,0,0,.18); }
+.panel-nav-dots span { background: var(--glass-line); }
+.panel-nav-dots span.active { background: var(--terracotta); }
+
+/* ============ sheets + side panels ============ */
+.sheet-backdrop { background: rgba(0,0,0,.52); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.sheet { background: var(--paper); border: 1px solid var(--glass-line); border-bottom: 0; box-shadow: 0 -24px 60px -24px rgba(0,0,0,.55); }
+.sheet-handle { background: var(--terracotta); opacity: .5; }
+.sheet h2, .side-page-title { color: var(--ink); font-weight: var(--head-w, 600); }
+.side-page-sub, .sheet-empty, .empty-note, .no-results, .order-empty, .order-qr-note, .loading, .error-state { color: var(--text-secondary); }
+.cart-line, .notif-item { border-color: var(--glass-line); }
+.order-page-total { border-color: var(--glass-line); color: var(--ink); }
+.order-qr-wrap { border-color: var(--glass-line); }
+.note-input { border-color: var(--glass-line); }
+.note-label { color: var(--text-secondary); }
+
+/* ============ cover / title card (each theme adds its own frame + emblem) ============ */
+.cover-face { background: transparent; }
+.cover-border {
+  border: 0; border-radius: var(--cover-r, 22px); background: var(--cover-card, var(--glass));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 10px)); backdrop-filter: blur(var(--glass-blur, 10px));
+  animation: txCoverIn .95s cubic-bezier(.2,.8,.2,1) both;
+}
+.cover-cafe-name { font-family: var(--font-cover-sub, var(--font-head)); color: var(--terracotta); font-style: var(--cover-sub-style, italic); }
+.cover-menu-word { font-family: var(--font-cover, var(--font-head)); color: var(--ink); }
+.cover-illustration { width: var(--emblem-w, 120px); height: var(--emblem-h, 96px); color: var(--ink); }
+.cover-illustration svg { display: none; }          /* the default line-art is swapped for the theme's emblem */
+.cover-illustration::before { content: ""; display: block; width: 100%; height: 100%; background: var(--emblem) center / contain no-repeat; animation: txFloat 5s ease-in-out infinite; }
+.cover-meta { color: var(--text-secondary); }
+.cover-meta .cover-hours { color: var(--ink); }

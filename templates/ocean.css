@@ -1,0 +1,47 @@
+/* templates/ocean.css — "Ocean Breeze": sunny aqua, waves rolling along the bottom, bubbles rising. */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #E6FAF8; --paper: #FFFFFF; --ink: #083A52; --text-secondary: #43697C;
+  --olive: #077B97; --olive-dark: #056782; --olive-soft: #D3F3F5;
+  --terracotta: #BC3D23; --border: rgba(7,123,151,.22); --danger: #B3261E; --placeholder-bg: #D5F1F0;
+  --on-primary: #FFFFFF; --on-accent: #FFFFFF;
+  --toast-bg: #083A52; --toast-fg: #FFFFFF; --note-focus-bg: #FFFFFF;
+  --search-tint: rgba(230,250,248,.6); --bar-solid: rgba(230,250,248,.94);
+
+  --font-head: 'Fredoka', sans-serif; --font-body: 'Nunito', sans-serif;
+  --font-cover: 'Fredoka', sans-serif; --font-cover-sub: 'Fredoka', sans-serif; --font-item: 'Nunito', sans-serif; --item-w: 800;
+
+  --bg-a: rgba(110,222,232,.66); --bg-b: rgba(172,242,212,.66); --bg-c: rgba(255,240,196,.8); --bg-d: rgba(142,192,255,.52); --bg-dur: 24s;
+  --glass: rgba(255,255,255,.72); --glass-line: rgba(7,123,151,.2); --glass-blur: 12px;
+  --btn-bg: linear-gradient(180deg, #16A0BE, #077B97 60%, #066886);
+  --btn-shadow: 0 10px 22px -10px rgba(7,123,151,.75), inset 0 1px 0 rgba(255,255,255,.4);
+  --rule: linear-gradient(90deg, #3FB6C4, rgba(63,182,196,0));
+  --glow: #3FB6C4; --shadow-soft: 0 14px 30px -18px rgba(7,90,120,.4);
+  --item-r: 24px; --photo-r: 18px; --search-r: 30px;
+  --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 90'%3E %3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23FFD47A'/%3E%3Cstop offset='1' stop-color='%23FF8A5B'/%3E%3C/linearGradient%3E%3CclipPath id='c'%3E%3Crect width='120' height='52'/%3E%3C/clipPath%3E%3C/defs%3E %3Ccircle cx='60' cy='52' r='24' fill='url(%23s)' clip-path='url(%23c)'/%3E %3Cg stroke='%23FF8A5B' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M60 14 V22 M28 24 L34 30 M92 24 L86 30 M14 46 H22 M98 46 H106'/%3E%3C/g%3E %3Cg fill='none' stroke-linecap='round' stroke-width='4'%3E%3Cpath d='M10 60 q12 -12 25 0 t25 0 t25 0 t25 0' stroke='%23077B97'/%3E%3Cpath d='M10 74 q12 -12 25 0 t25 0 t25 0 t25 0' stroke='%233FB6C4'/%3E%3Cpath d='M10 88 q12 -12 25 0 t25 0 t25 0 t25 0' stroke='%239BE3E0'/%3E%3C/g%3E%3C/svg%3E"); --emblem-w: 118px; --emblem-h: 88px;
+  --h1-size: 34px; --h1-ls: .01em; --cat-tt: none; --cat-ls: .01em; --cat-size: 24px;
+}
+/* rolling waves along the bottom edge */
+html::after {
+  content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 150px; z-index: -2; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='120' viewBox='0 0 800 120'%3E%3Cpath d='M0 76.0 L10 75.6 L20 74.5 L30 72.9 L40 70.8 L50 68.3 L60 65.5 L70 62.7 L80 60.0 L90 57.4 L100 55.3 L110 53.6 L120 52.5 L130 52.0 L140 52.2 L150 53.1 L160 54.5 L170 56.5 L180 58.9 L190 61.5 L200 64.3 L210 67.1 L220 69.8 L230 72.1 L240 73.9 L250 75.2 L260 75.9 L270 75.9 L280 75.3 L290 74.0 L300 72.2 L310 70.0 L320 67.4 L330 64.6 L340 61.8 L350 59.1 L360 56.7 L370 54.7 L380 53.2 L390 52.3 L400 52.0 L410 52.4 L420 53.5 L430 55.1 L440 57.2 L450 59.7 L460 62.5 L470 65.3 L480 68.0 L490 70.6 L500 72.7 L510 74.4 L520 75.5 L530 76.0 L540 75.8 L550 74.9 L560 73.5 L570 71.5 L580 69.1 L590 66.5 L600 63.7 L610 60.9 L620 58.2 L630 55.9 L640 54.1 L650 52.8 L660 52.1 L670 52.1 L680 52.7 L690 54.0 L700 55.8 L710 58.0 L720 60.6 L730 63.4 L740 66.2 L750 68.9 L760 71.3 L770 73.3 L780 74.8 L790 75.7 L800 76.0 V120 H0 Z' fill='%235FD1D8' fill-opacity='.26'/%3E%3C/svg%3E") repeat-x 0 100% / 800px 120px, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='120' viewBox='0 0 800 120'%3E%3Cpath d='M0 50.0 L10 52.2 L20 54.3 L30 56.4 L40 58.2 L50 59.9 L60 61.3 L70 62.5 L80 63.3 L90 63.8 L100 64.0 L110 63.8 L120 63.3 L130 62.5 L140 61.3 L150 59.9 L160 58.2 L170 56.4 L180 54.3 L190 52.2 L200 50.0 L210 47.8 L220 45.7 L230 43.6 L240 41.8 L250 40.1 L260 38.7 L270 37.5 L280 36.7 L290 36.2 L300 36.0 L310 36.2 L320 36.7 L330 37.5 L340 38.7 L350 40.1 L360 41.8 L370 43.6 L380 45.7 L390 47.8 L400 50.0 L410 52.2 L420 54.3 L430 56.4 L440 58.2 L450 59.9 L460 61.3 L470 62.5 L480 63.3 L490 63.8 L500 64.0 L510 63.8 L520 63.3 L530 62.5 L540 61.3 L550 59.9 L560 58.2 L570 56.4 L580 54.3 L590 52.2 L600 50.0 L610 47.8 L620 45.7 L630 43.6 L640 41.8 L650 40.1 L660 38.7 L670 37.5 L680 36.7 L690 36.2 L700 36.0 L710 36.2 L720 36.7 L730 37.5 L740 38.7 L750 40.1 L760 41.8 L770 43.6 L780 45.7 L790 47.8 L800 50.0 V120 H0 Z' fill='%230A8CAA' fill-opacity='.20'/%3E%3C/svg%3E") repeat-x 0 100% / 800px 120px;
+  animation: txWaves 16s linear infinite;
+}
+@keyframes txWaves { to { background-position: -800px 100%, 800px 100%; } }
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #056782, #16A0BE 50%, #077B97); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: txShine 7s linear infinite;
+}
+.category-title { font-weight: 600; }
+.mi-name { font-size: 15.5px; }
+
+.cover-border {
+  --cover-card: rgba(255,255,255,.76);
+  max-width: 366px; padding: 46px 28px 40px; border: 2px solid rgba(255,255,255,.9); border-radius: 40px;
+  box-shadow: 0 34px 70px -34px rgba(7,90,120,.6), 0 0 0 8px rgba(255,255,255,.3);
+}
+.cover-cafe-name { font-style: normal; font-weight: 500; font-size: 18px; color: #BC3D23; margin-bottom: 0; }
+.cover-menu-word { font-size: 64px; font-weight: 700; letter-spacing: .01em; text-transform: none; margin-bottom: 14px; }
+.cover-meta .cover-hours { color: #056782; }

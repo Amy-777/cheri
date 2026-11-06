@@ -1,0 +1,54 @@
+/* templates/holi.css — "Holi Hues" (seasonal): a white wall caught in a colour fight — gulal clouds billow and
+   drift in pink, yellow, green and blue, the title is painted in all of them, and every add-to-cart throws more colour. */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #FFF8F2; --paper: #FFFFFF; --ink: #2B1B3D; --text-secondary: #6C5A7E;
+  --olive: #E5246E; --olive-dark: #C21562; --olive-soft: #FFE3EE;
+  --terracotta: #1F8FE0; --border: rgba(43,27,61,.14); --danger: #B3261E; --placeholder-bg: #FBEAF2;
+  --on-primary: #FFFFFF; --on-accent: #FFFFFF;
+  --toast-bg: #2B1B3D; --toast-fg: #FFFFFF; --note-focus-bg: #FFFFFF;
+  --search-tint: rgba(255,248,242,.6); --bar-solid: rgba(255,248,242,.94);
+
+  --font-head: 'Baloo 2', sans-serif; --font-body: 'Nunito', sans-serif;
+  --font-cover: 'Baloo 2', sans-serif; --font-cover-sub: 'Baloo 2', sans-serif; --font-item: 'Nunito', sans-serif; --item-w: 800;
+
+  --bg-a: rgba(255,61,139,.42); --bg-b: rgba(255,194,31,.48); --bg-c: rgba(31,162,255,.36); --bg-d: rgba(36,194,107,.36); --bg-dur: 14s;
+  --glass: rgba(255,255,255,.78); --glass-line: rgba(43,27,61,.12); --glass-blur: 10px;
+  --btn-bg: linear-gradient(110deg, #FF3D8B, #E5246E 45%, #8E44EF);
+  --btn-shadow: 0 10px 22px -10px rgba(229,36,110,.7), inset 0 1px 0 rgba(255,255,255,.35);
+  --rule: linear-gradient(90deg, #FF3D8B, #FFC21F 30%, #24C26B 60%, #1FA2FF 85%, transparent);
+  --glow: #FF3D8B; --shadow-soft: 0 14px 30px -18px rgba(43,27,61,.35);
+  --item-r: 22px; --photo-r: 16px; --search-r: 30px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='9' r='5' fill='%23FF3D8B' opacity='.85'/%3E%3Ccircle cx='15.5' cy='8' r='4.5' fill='%23FFC21F' opacity='.85'/%3E%3Ccircle cx='12' cy='15.5' r='5' fill='%231FA2FF' opacity='.8'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 130 100'%3E %3Cstyle%3E@keyframes p%7B0%25,100%25%7Btransform:translateY(0) scale(1)%7D50%25%7Btransform:translateY(-4px) scale(1.06)%7D%7D.a%7Banimation:p 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50%25 100%25%7D.b%7Banimation-delay:-.9s%7D.c%7Banimation-delay:-1.8s%7D%3C/style%3E %3Cg class='a'%3E%3Ccircle cx='30' cy='30' r='14' fill='%23FF3D8B' opacity='.55'/%3E%3Ccircle cx='22' cy='38' r='9' fill='%23FF3D8B' opacity='.4'/%3E%3C/g%3E %3Cg class='a b'%3E%3Ccircle cx='66' cy='22' r='16' fill='%23FFC21F' opacity='.6'/%3E%3Ccircle cx='78' cy='30' r='9' fill='%23FFC21F' opacity='.45'/%3E%3C/g%3E %3Cg class='a c'%3E%3Ccircle cx='102' cy='32' r='13' fill='%231FA2FF' opacity='.55'/%3E%3Ccircle cx='110' cy='40' r='8' fill='%2324C26B' opacity='.5'/%3E%3C/g%3E %3Cpath d='M10 64 Q30 50 50 64 Z' fill='%23FF3D8B'/%3E%3Cpath d='M44 64 Q66 46 88 64 Z' fill='%23FFC21F'/%3E%3Cpath d='M82 64 Q102 50 122 64 Z' fill='%231FA2FF'/%3E %3Cpath d='M6 64 H124 L116 86 Q65 96 14 86 Z' fill='%23FFFFFF' stroke='%232B1B3D' stroke-width='2.4' stroke-linejoin='round'/%3E %3Cpath d='M14 74 H116' stroke='%2324C26B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); --emblem-w: 130px; --emblem-h: 100px;
+  --head-w: 800; --h1-size: 36px; --h1-ls: 0; --cat-tt: none; --cat-ls: 0; --cat-size: 26px;
+}
+/* two big gulal clouds that billow and change shape */
+html::before, html::after { content: ""; position: fixed; z-index: -2; pointer-events: none; border-radius: 50%; filter: blur(30px); }
+html::before { left: -20vmax; top: -16vmax; width: 70vmax; height: 60vmax; background: radial-gradient(circle at 40% 40%, rgba(255,61,139,.5), rgba(255,194,31,.3) 50%, transparent 70%); animation: hlBillow 11s ease-in-out infinite alternate; }
+html::after { right: -24vmax; bottom: -18vmax; width: 76vmax; height: 64vmax; background: radial-gradient(circle at 60% 60%, rgba(31,162,255,.42), rgba(36,194,107,.3) 50%, transparent 70%); animation: hlBillow 13s ease-in-out -4s infinite alternate-reverse; }
+@keyframes hlBillow { 0% { transform: scale(1) rotate(0deg); border-radius: 50%; } 50% { transform: scale(1.12) rotate(14deg); border-radius: 42% 58% 55% 45%; } 100% { transform: scale(.95) rotate(-10deg); border-radius: 58% 42% 46% 54%; } }
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #FF3D8B, #FFC21F 30%, #24C26B 55%, #1FA2FF 80%, #8E44EF); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: txShine 5s linear infinite;
+}
+.category-title { font-weight: 800; }
+.mi-price { color: #C21562; font-weight: 800; }
+
+/* cover: a white card that's clearly been in the colour fight */
+.cover-border {
+  --cover-card: #FFFFFF;
+  max-width: 340px; padding: 46px 24px 38px; border: 2.5px solid #2B1B3D; border-radius: 28px; transform: rotate(-1deg);
+  background:
+    radial-gradient(70px 60px at 6% 8%, rgba(255,61,139,.55), transparent 70%), radial-gradient(80px 70px at 96% 12%, rgba(255,194,31,.6), transparent 70%),
+    radial-gradient(90px 70px at 4% 96%, rgba(36,194,107,.5), transparent 70%), radial-gradient(90px 80px at 98% 94%, rgba(31,162,255,.5), transparent 70%),
+    var(--cover-card);
+  -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 6px 6px 0 #2B1B3D, 0 34px 70px -30px rgba(43,27,61,.5);
+}
+.cover-cafe-name { font-style: normal; font-weight: 700; font-size: 15px; color: #2B1B3D; margin-bottom: 0; }
+.cover-menu-word { font-size: 70px; font-weight: 800; letter-spacing: 0; text-transform: none; margin-bottom: 8px; line-height: 1; }
+.cover-menu-word::after { content: "Happy Holi!"; display: block; font-size: 18px; margin-top: 4px; }
+.cover-meta { color: #4A3A5C; font-weight: 600; }
+.cover-meta .cover-hours { color: #C21562; font-weight: 800; }
+@media (prefers-reduced-motion: reduce) { html::before, html::after { animation: none; } }

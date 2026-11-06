@@ -1,0 +1,41 @@
+/* templates/zen.css — "Zen / Wabi-Sabi": paper, ink and a single vermilion seal. Quiet, generous, slow. */
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #F1EDE4; --paper: #FBF9F4; --ink: #26231F; --text-secondary: #655F55;
+  --olive: #2F2C28; --olive-dark: #9A3A26; --olive-soft: #E8E2D4;
+  --terracotta: #B5432A; --border: rgba(38,35,31,.16); --danger: #A8341F; --placeholder-bg: #E6DFD0;
+  --on-primary: #F1EDE4; --on-accent: #FFFFFF;
+  --toast-bg: #26231F; --toast-fg: #F1EDE4; --note-focus-bg: #FFFFFF;
+  --search-tint: rgba(241,237,228,.6); --bar-solid: rgba(241,237,228,.94);
+
+  --font-head: 'Shippori Mincho', serif; --font-body: 'Zen Kaku Gothic New', sans-serif;
+  --font-cover: 'Shippori Mincho', serif; --font-cover-sub: 'Zen Kaku Gothic New', sans-serif; --font-item: 'Zen Kaku Gothic New', sans-serif; --item-w: 700;
+
+  --bg-a: rgba(219,205,178,.78); --bg-b: rgba(196,208,190,.58); --bg-c: rgba(228,190,170,.42); --bg-d: rgba(244,240,231,.9); --bg-dur: 46s;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .14 0 0 0 0 .11 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E"); --pattern-size: 180px; --pattern-o: .5;
+  --glass: rgba(251,249,244,.74); --glass-line: rgba(38,35,31,.13); --glass-blur: 6px;
+  --btn-bg: #2F2C28; --btn-shadow: 0 8px 16px -10px rgba(0,0,0,.6);
+  --rule: linear-gradient(90deg, #B5432A 0 26px, rgba(38,35,31,.2) 26px);
+  --glow: transparent; --shadow-soft: 0 10px 24px -20px rgba(38,35,31,.5);
+  --item-r: 8px; --photo-r: 5px; --search-r: 8px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.4 A8.6 8.6 0 1 0 19.8 8' fill='none' stroke='%2326231F' stroke-width='2.6' stroke-linecap='round'/%3E%3Crect x='17.2' y='16.6' width='4.2' height='4.2' fill='%23B5432A'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3E %3Cstyle%3E@keyframes d{from{stroke-dashoffset:214}to{stroke-dashoffset:0}}@keyframes f{from{opacity:0}to{opacity:1}}.e{stroke-dasharray:214;animation:d 2.8s cubic-bezier(.3,.6,.3,1) both}.h{animation:f .8s 2.6s both}%3C/style%3E %3Cpath class='e' d='M60 14 A34 34 0 1 0 92 34' fill='none' stroke='%2326231F' stroke-width='7.5' stroke-linecap='round'/%3E %3Cpath class='e' d='M60 14 A34 34 0 1 0 92 34' fill='none' stroke='%2326231F' stroke-width='2.4' stroke-linecap='round' opacity='.35' transform='translate(1.5 1)'/%3E %3Cg class='h'%3E%3Crect x='90' y='68' width='16' height='16' fill='%23B5432A'/%3E%3Cpath d='M94.5 72.5 H101.5 M98 72.5 V79.5 M94.5 79.5 H101.5' stroke='%23F6EFE2' stroke-width='1.6' fill='none'/%3E%3C/g%3E%3C/svg%3E"); --emblem-w: 118px; --emblem-h: 98px;
+  --head-w: 600; --h1-size: 34px; --h1-ls: .1em; --cat-tt: none; --cat-ls: .08em; --cat-size: 22px;
+}
+.menu-item.priority { border-color: #B5432A; }
+.header-subtitle { letter-spacing: .32em; }
+.cover-illustration::before { animation: none; }       /* the enso draws itself once, then rests */
+
+/* cover: no box — just ink, air, and a thin vertical line */
+.cover-border {
+  --cover-card: transparent; max-width: 330px; padding: 40px 12px 30px; border-radius: 0; background: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none;
+}
+.cover-border::before, .cover-border::after { content: ""; position: absolute; left: 50%; width: 1px; height: 64px; background: #26231F; opacity: .35; }
+.cover-border::before { top: -34px; } .cover-border::after { bottom: -34px; }
+.cover-cafe-name { font-style: normal; font-weight: 500; font-size: 12px; letter-spacing: .34em; text-transform: uppercase; color: #26231F; margin-bottom: 18px; }
+.cover-cafe-name::before { content: ""; display: inline-block; width: 8px; height: 8px; background: #B5432A; margin-right: 12px; vertical-align: 1px; }
+.cover-menu-word { font-size: 58px; font-weight: 500; letter-spacing: .3em; padding-left: .3em; margin-bottom: 20px; }
+.cover-meta { font-size: 13px; letter-spacing: .04em; }
+.cover-meta .cover-hours { font-weight: 500; }

@@ -1,0 +1,50 @@
+/* templates/retro.css — "70s Retro": mustard, tomato and teal, chunky type, rainbow arcs breathing in the corner. */
+@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #FFF1D0; --paper: #FFF9E8; --ink: #3B2314; --text-secondary: #6E4C33;
+  --olive: #C9401C; --olive-dark: #A8331A; --olive-soft: #FFE2B0;
+  --terracotta: #167468; --border: rgba(59,35,20,.24); --danger: #A8331A; --placeholder-bg: #FFE3B0;
+  --on-primary: #FFFFFF; --on-accent: #FFFFFF;
+  --toast-bg: #3B2314; --toast-fg: #FFF1D0; --note-focus-bg: #FFFFFF;
+  --search-tint: rgba(255,241,208,.6); --bar-solid: rgba(255,241,208,.94);
+
+  --font-head: 'Shrikhand', serif; --font-body: 'Outfit', sans-serif;
+  --font-cover: 'Shrikhand', serif; --font-cover-sub: 'Outfit', sans-serif; --font-item: 'Outfit', sans-serif; --item-w: 700;
+
+  --bg-a: rgba(255,196,80,.72); --bg-b: rgba(255,140,100,.5); --bg-c: rgba(80,190,170,.46); --bg-d: rgba(255,222,164,.85); --bg-dur: 20s;
+  --glass: rgba(255,249,232,.9); --glass-line: #3B2314; --glass-blur: 0px; --item-bw: 2px;
+  --btn-bg: linear-gradient(180deg, #E0522E, #C9401C); --btn-shadow: 0 4px 0 #7A2410;
+  --rule: repeating-linear-gradient(90deg, #F2A900 0 12px, #C9401C 12px 24px, #167468 24px 36px);
+  --glow: transparent; --shadow-soft: 4px 4px 0 #F2A900;
+  --item-r: 18px; --photo-r: 12px; --search-r: 26px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(0.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(45.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(90.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(135.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(180.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(225.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(270.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Cellipse cx='12' cy='5.7' rx='4.1' ry='6.9' transform='rotate(315.0 12 12)' fill='%23F2A900' opacity='.95'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23C9401C'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 130 84'%3E %3Cg fill='none' stroke-linecap='butt'%3E%3Cpath d='M10 76 A55 55 0 0 1 120 76' stroke='%23C9401C' stroke-width='10'/%3E%3Cpath d='M22 76 A43 43 0 0 1 108 76' stroke='%23F2A900' stroke-width='10'/%3E%3Cpath d='M34 76 A31 31 0 0 1 96 76' stroke='%23167468' stroke-width='10'/%3E%3C/g%3E %3Ccircle cx='65' cy='76' r='15' fill='%233B2314'/%3E%3Ccircle cx='65' cy='76' r='9' fill='%23FFF1D0'/%3E %3Cpath d='M4 80 H126' stroke='%233B2314' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); --emblem-w: 128px; --emblem-h: 84px;
+  --head-w: 400; --h1-size: 34px; --h1-ls: .01em; --cat-tt: none; --cat-ls: .01em; --cat-size: 23px;
+}
+/* rainbow arcs breathing in two corners */
+html::before, html::after {
+  content: ""; position: fixed; border-radius: 50%; z-index: -2; pointer-events: none;
+  background: repeating-radial-gradient(circle at 50% 50%, #F2A900 0 4.4vmax, #E4572E 4.4vmax 8.8vmax, #2A9D8F 8.8vmax 13.2vmax, #FFF1D0 13.2vmax 17.6vmax);
+}
+html::before { right: -42vmax; top: -42vmax; width: 84vmax; height: 84vmax; opacity: .55; animation: txBreath 9s ease-in-out infinite; }
+html::after { left: -30vmax; bottom: -30vmax; width: 60vmax; height: 60vmax; opacity: .4; animation: txBreath 12s ease-in-out infinite reverse; }
+@keyframes txBreath { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.07) rotate(6deg); } }
+header h1 { color: #C9401C; text-shadow: 2px 2px 0 #F2A900; }
+.category-title { text-shadow: 1.5px 1.5px 0 #F2A900; }
+.category-rule { height: 4px; border-radius: 2px; }
+.mi-price { font-family: 'Shrikhand', serif; font-weight: 400; letter-spacing: .02em; }
+.cart-pill, .place-order-btn, .qty-btn.primary { border: 2px solid #3B2314; }
+.cart-pill:active, .place-order-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #7A2410; }
+.priority-badge { border: 1.5px solid #3B2314; }
+
+/* cover: 70s stripes around a cream card */
+.cover-border {
+  --cover-card: #FFF9E8;
+  max-width: 322px; padding: 42px 22px 36px; border: 3px solid #3B2314; border-radius: 30px; -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: 0 0 0 8px #F2A900, 0 0 0 15px #E4572E, 0 0 0 22px #2A9D8F, 0 34px 60px -14px rgba(59,35,20,.55);
+}
+.cover-cafe-name { font-style: normal; font-weight: 700; font-size: 13px; letter-spacing: .28em; text-transform: uppercase; color: #167468; margin-bottom: 6px; padding-left: .28em; }
+.cover-menu-word { font-size: 68px; letter-spacing: .01em; text-transform: none; font-weight: 400; margin-bottom: 14px; color: #C9401C; text-shadow: 3px 3px 0 #F2A900, 6px 6px 0 #167468; }
+.cover-meta { font-weight: 500; }
+.cover-meta .cover-hours { color: #A8331A; font-weight: 700; }

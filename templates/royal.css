@@ -1,0 +1,54 @@
+/* templates/royal.css — "Royal Court": burgundy velvet, antique gold, drifting gold dust. */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #25060F; --paper: #3A0F1E; --ink: #F7EBD0; --text-secondary: #CDB58C;
+  --olive: #D4AF37; --olive-dark: #F0CF7A; --olive-soft: #4C1728;
+  --terracotta: #E3BE5C; --border: rgba(212,175,55,.28); --danger: #FF9A8A; --placeholder-bg: #4A1A2B;
+  --on-primary: #2A0813; --on-accent: #2A0813;
+  --toast-bg: #F0CF7A; --toast-fg: #2A0813; --note-focus-bg: #4A1526;
+  --search-tint: rgba(37,6,15,.6); --bar-solid: rgba(37,6,15,.94);
+
+  --font-head: 'Cinzel', serif; --font-body: 'Lora', serif;
+  --font-cover: 'Cinzel Decorative', 'Cinzel', serif; --font-cover-sub: 'Cinzel', serif;
+  --font-item: 'Lora', serif; --font-price: 'Cinzel', serif;
+
+  --bg-a: rgba(150,26,62,.62); --bg-b: rgba(92,14,42,.72); --bg-c: rgba(160,118,22,.30); --bg-d: rgba(122,20,52,.52); --bg-dur: 32s;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E %3Cg fill='none' stroke='%23D4AF37' stroke-width='.7'%3E%3Cpath d='M40 4 L76 40 L40 76 L4 40 Z'/%3E%3Cpath d='M40 18 L62 40 L40 62 L18 40 Z'/%3E%3Ccircle cx='40' cy='40' r='3'/%3E%3C/g%3E %3Cg fill='%23D4AF37'%3E%3Ccircle cx='0' cy='0' r='2'/%3E%3Ccircle cx='80' cy='0' r='2'/%3E%3Ccircle cx='0' cy='80' r='2'/%3E%3Ccircle cx='80' cy='80' r='2'/%3E%3C/g%3E%3C/svg%3E"); --pattern-size: 80px; --pattern-o: .085;
+  --glass: rgba(58,15,30,.62); --glass-line: rgba(212,175,55,.32); --glass-blur: 10px;
+  --btn-bg: linear-gradient(180deg, #F6DE8E, #D4AF37 55%, #B8891F);
+  --btn-shadow: 0 8px 20px -8px rgba(212,175,55,.65), inset 0 1px 0 rgba(255,255,255,.4);
+  --rule: linear-gradient(90deg, transparent, #D4AF37 20%, #F0CF7A 50%, #D4AF37 80%, transparent);
+  --glow: #D4AF37; --shadow-soft: 0 14px 30px -20px rgba(0,0,0,.85);
+  --item-r: 10px; --photo-r: 8px; --search-r: 8px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 18 L2 8 L8 12 L12 4 L16 12 L22 8 L21 18 Z' fill='%23D4AF37'/%3E%3Crect x='3' y='19.3' width='18' height='2.6' rx='1' fill='%23D4AF37'/%3E%3Ccircle cx='12' cy='3.6' r='1.5' fill='%23F6E3A1'/%3E%3C/svg%3E"); --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 92'%3E %3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23FBEFC0'/%3E%3Cstop offset='.5' stop-color='%23D4AF37'/%3E%3Cstop offset='1' stop-color='%238F6A14'/%3E%3C/linearGradient%3E%3C/defs%3E %3Cpath d='M14 70 L7 30 L34 48 L60 12 L86 48 L113 30 L106 70 Z' fill='url(%23g)' stroke='%23FBEFC0' stroke-width='1.4' stroke-linejoin='round'/%3E %3Cpath d='M34 48 L38 70 M60 12 L60 70 M86 48 L82 70' stroke='%238F6A14' stroke-width='1' opacity='.55' fill='none'/%3E %3Crect x='13' y='72' width='94' height='11' rx='3' fill='url(%23g)' stroke='%23FBEFC0' stroke-width='1.4'/%3E %3Ccircle cx='7' cy='28' r='5' fill='%23FBEFC0'/%3E%3Ccircle cx='60' cy='9' r='6.5' fill='%23FBEFC0'/%3E%3Ccircle cx='113' cy='28' r='5' fill='%23FBEFC0'/%3E %3Ccircle cx='34' cy='78' r='2.4' fill='%237A1230'/%3E%3Ccircle cx='60' cy='78' r='3' fill='%237A1230'/%3E%3Ccircle cx='86' cy='78' r='2.4' fill='%237A1230'/%3E %3C/svg%3E"); --emblem-w: 112px; --emblem-h: 86px;
+  --h1-size: 27px; --h1-ls: .16em; --h1-tt: uppercase; --cat-ls: .16em; --cat-size: 17px;
+}
+
+/* gold-leaf lettering */
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #B8891F 0%, #F9E7A6 32%, #D4AF37 50%, #F9E7A6 68%, #B8891F 100%);
+  background-size: 220% 100%; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; animation: txShine 6s linear infinite;
+}
+.item-name, .mi-name { letter-spacing: .01em; }
+.mi-price { font-weight: 600; letter-spacing: .04em; }
+.menu-item { border-left: 3px solid var(--terracotta); }
+
+/* cover: double gold frame, filigree corners, crown */
+.cover-border {
+  --cover-card: rgba(37,6,15,.5);
+  max-width: 372px; padding: 50px 30px 42px; border: 1px solid #D4AF37; border-radius: 4px;
+  outline: 1px solid rgba(212,175,55,.42); outline-offset: 8px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(0 0) scale(1 1)'%3E%3Cpath d='M2 62 V16 Q2 2 16 2 H62' fill='none' stroke='%23D4AF37' stroke-width='1.6'/%3E %3Cpath d='M8 62 V20 Q8 8 20 8 H62' fill='none' stroke='%23D4AF37' stroke-width='.8' opacity='.65'/%3E %3Ccircle cx='16' cy='16' r='3.2' fill='%23D4AF37'/%3E %3Cpath d='M16 30 Q28 30 28 42 M30 16 Q30 28 42 28' fill='none' stroke='%23D4AF37' stroke-width='1.2'/%3E %3Ccircle cx='28' cy='42' r='1.6' fill='%23D4AF37'/%3E%3Ccircle cx='42' cy='28' r='1.6' fill='%23D4AF37'/%3E%3C/g%3E%3C/svg%3E") top left / 58px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cpath d='M2 62 V16 Q2 2 16 2 H62' fill='none' stroke='%23D4AF37' stroke-width='1.6'/%3E %3Cpath d='M8 62 V20 Q8 8 20 8 H62' fill='none' stroke='%23D4AF37' stroke-width='.8' opacity='.65'/%3E %3Ccircle cx='16' cy='16' r='3.2' fill='%23D4AF37'/%3E %3Cpath d='M16 30 Q28 30 28 42 M30 16 Q30 28 42 28' fill='none' stroke='%23D4AF37' stroke-width='1.2'/%3E %3Ccircle cx='28' cy='42' r='1.6' fill='%23D4AF37'/%3E%3Ccircle cx='42' cy='28' r='1.6' fill='%23D4AF37'/%3E%3C/g%3E%3C/svg%3E") top right / 58px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cpath d='M2 62 V16 Q2 2 16 2 H62' fill='none' stroke='%23D4AF37' stroke-width='1.6'/%3E %3Cpath d='M8 62 V20 Q8 8 20 8 H62' fill='none' stroke='%23D4AF37' stroke-width='.8' opacity='.65'/%3E %3Ccircle cx='16' cy='16' r='3.2' fill='%23D4AF37'/%3E %3Cpath d='M16 30 Q28 30 28 42 M30 16 Q30 28 42 28' fill='none' stroke='%23D4AF37' stroke-width='1.2'/%3E %3Ccircle cx='28' cy='42' r='1.6' fill='%23D4AF37'/%3E%3Ccircle cx='42' cy='28' r='1.6' fill='%23D4AF37'/%3E%3C/g%3E%3C/svg%3E") bottom left / 58px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cpath d='M2 62 V16 Q2 2 16 2 H62' fill='none' stroke='%23D4AF37' stroke-width='1.6'/%3E %3Cpath d='M8 62 V20 Q8 8 20 8 H62' fill='none' stroke='%23D4AF37' stroke-width='.8' opacity='.65'/%3E %3Ccircle cx='16' cy='16' r='3.2' fill='%23D4AF37'/%3E %3Cpath d='M16 30 Q28 30 28 42 M30 16 Q30 28 42 28' fill='none' stroke='%23D4AF37' stroke-width='1.2'/%3E %3Ccircle cx='28' cy='42' r='1.6' fill='%23D4AF37'/%3E%3Ccircle cx='42' cy='28' r='1.6' fill='%23D4AF37'/%3E%3C/g%3E%3C/svg%3E") bottom right / 58px no-repeat,
+    var(--cover-card);
+  box-shadow: 0 34px 80px -30px rgba(0,0,0,.9), 0 0 70px -22px rgba(212,175,55,.4);
+}
+.cover-cafe-name { font-style: normal; font-size: 12.5px; letter-spacing: .34em; text-transform: uppercase; color: #E3BE5C; margin-bottom: 12px; }
+.cover-menu-word { font-size: 52px; letter-spacing: .08em; margin-bottom: 22px; }
+.cover-illustration { margin-bottom: 22px; filter: drop-shadow(0 6px 14px rgba(212,175,55,.35)); }
+.cover-meta { font-family: 'Lora', serif; font-style: italic; }
+.cover-meta .cover-hours { font-style: normal; font-weight: 600; letter-spacing: .04em; color: #F0CF7A; }

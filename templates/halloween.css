@@ -1,0 +1,119 @@
+/* templates/halloween.css — seasonal skin, loaded on top of default.css.
+   Ported from the original standalone mockup's visual identity (colors,
+   typography, card treatment) onto the shared engine's real class names.
+   The cinematic hero section (riders, sign, bats, lightning, entity reveal)
+   was deliberately left for a later pass — this covers the core spooky
+   identity: palette, type, card styling, and the blood-drip add-to-cart
+   effect (see templates/halloween.js for the JS half of that). */
+
+:root {
+  --cream: var(--void, #060302);
+  --paper: #14100D;
+  --ink: #EDE3D6;
+  --ink-soft: #EDE3D6;
+  --text-secondary: #A99789;
+  --border: #2A1F1A;
+  --teal: #7A0F17;      /* "blood" — reused for primary actions/accents */
+  --teal-soft: #2A1210;
+  --amber: #E24A32;     /* "ember" — reused for prices/highlights */
+  --danger: #E24A32;
+
+  --void: #060302;
+  --blood: #7A0F17;
+  --ember: #E24A32;
+  --glow: #FF8C46;
+  --bone: #EDE3D6;
+  --bone-dim: #A99789;
+  --line: #2A1F1A;
+}
+
+body {
+  background: radial-gradient(130% 60% at 50% 0%, #2A0D08 0%, #120806 40%, var(--void) 75%);
+  color: var(--bone);
+}
+h1, h2, .brand, .item-name, .mi-name, .category-title, .cafe-name, #cafe-name {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+header, .header-top, .header-center { background: transparent; }
+#cafe-name { font-style: italic; color: var(--bone); }
+.header-subtitle, .table-chip { color: var(--bone-dim); border-color: var(--line); }
+.table-chip { background: rgba(20,10,9,.7); border: 1px solid var(--line); }
+.header-mark { border-color: var(--ember); color: var(--glow); }
+.bell-btn { color: var(--bone); }
+
+.search-box { background: var(--paper); border: 1px solid var(--line); color: var(--bone); }
+.search-box input { background: transparent; color: var(--bone); }
+.search-box input::placeholder { color: var(--bone-dim); }
+
+.category-block { margin-top: 20px; }
+.category-title { font-style: italic; font-weight: 600; color: var(--bone); }
+.category-title.priority-title { color: var(--ember); }
+.category-icon { filter: hue-rotate(160deg) saturate(1.4); }
+.category-rule { background: var(--line); }
+
+.menu-item {
+  background: rgba(20,10,9,.75); backdrop-filter: blur(6px);
+  border: 1px solid var(--line); border-radius: 14px;
+}
+.menu-item.priority {
+  border-color: var(--ember);
+  box-shadow: 0 0 0 1px rgba(226,74,50,.25), 0 0 18px rgba(226,74,50,.25);
+  background: linear-gradient(135deg, rgba(122,15,23,.35), rgba(20,10,9,.75));
+}
+.priority-badge { background: var(--blood); color: var(--bone); }
+.mi-name { color: var(--bone); font-weight: 600; }
+.mi-unit, .mi-desc { color: var(--bone-dim); }
+.mi-price { color: var(--ember); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.qty-btn {
+  border: 1.5px solid var(--line); color: var(--bone); background: transparent;
+}
+.qty-btn:hover { border-color: var(--ember); }
+.qty-btn.primary { background: var(--blood); border-color: var(--ember); color: #fff; }
+.qty-num { color: var(--bone); font-weight: 700; }
+
+.bottom-bar { background: linear-gradient(to top, rgba(4,2,1,.9) 45%, transparent); }
+.pill-btn, .call-pill {
+  background: rgba(20,10,9,.92); border: 1px solid var(--line); color: var(--bone);
+}
+.call-pill.sent { background: var(--blood); border-color: var(--ember); }
+.place-order-btn, .your-order.has-items {
+  background: var(--blood) !important; border-color: var(--ember) !important; color: #fff !important;
+}
+
+.sheet, .modal, .paywall-card { background: #120A08; color: var(--bone); border: 1px solid var(--line); }
+.toast { background: rgba(6,3,2,.96); border: 1px solid var(--line); color: var(--bone); }
+
+/* ---- Ambient embers — lightweight CSS-only version, no JS particle loop ---- */
+.ember-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.ember-layer span {
+  position: absolute; bottom: -10px; width: 3px; height: 3px; border-radius: 50%;
+  background: var(--ember); opacity: 0; box-shadow: 0 0 6px var(--glow);
+  animation: ember-drift 9s linear infinite;
+}
+@keyframes ember-drift {
+  0% { opacity: 0; transform: translateY(0) translateX(0); }
+  10% { opacity: .8; }
+  90% { opacity: .4; }
+  100% { opacity: 0; transform: translateY(-100vh) translateX(20px); }
+}
+
+/* ---- Blood-drip add-to-cart effect (spawned by templates/halloween.js) ---- */
+.drips { position: fixed; inset: 0; z-index: 45; pointer-events: none; overflow: hidden; }
+.drip {
+  position: absolute; width: 9px; height: 9px;
+  background: linear-gradient(180deg, #A6121A, #4A080D);
+  border-radius: 0 50% 50% 50%; transform: rotate(45deg);
+  animation: dripFall cubic-bezier(.55,0,1,.45) forwards;
+}
+@keyframes dripFall {
+  0% { transform: translateY(0) rotate(45deg) scaleY(1); opacity: .95; }
+  70% { transform: translateY(var(--drip-dist)) rotate(45deg) scaleY(1.5); opacity: .9; }
+  85% { transform: translateY(calc(var(--drip-dist) + 6px)) rotate(45deg) scaleY(.6) scaleX(1.6); opacity: .8; }
+  100% { transform: translateY(calc(var(--drip-dist) + 10px)) rotate(45deg) scaleY(.3) scaleX(1.9); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ember-layer, .drip { animation: none !important; opacity: 0 !important; }
+}

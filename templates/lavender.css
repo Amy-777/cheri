@@ -1,0 +1,57 @@
+/* templates/lavender.css — "Lavender Aurora": violet night, teal aurora ribbons, twinkling stardust. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('theme-kit.css');
+
+:root {
+  --cream: #140B2E; --paper: #1F1247; --ink: #F0EAFF; --text-secondary: #B9AEDB;
+  --olive: #6E4BF0; --olive-dark: #7EE8D8; --olive-soft: #2A1B5C;
+  --terracotta: #B69CFF; --border: rgba(182,156,255,.26); --danger: #FF9AA8; --placeholder-bg: #2A1B5C;
+  --on-primary: #FFFFFF; --on-accent: #140B2E;
+  --toast-bg: #E4D9FF; --toast-fg: #140B2E; --note-focus-bg: #2A1B5C;
+  --search-tint: rgba(20,11,46,.6); --bar-solid: rgba(20,11,46,.94);
+
+  --font-head: 'Fraunces', serif; --font-body: 'Manrope', sans-serif;
+  --font-cover: 'Fraunces', serif; --font-cover-sub: 'Fraunces', serif; --font-item: 'Manrope', sans-serif;
+
+  --bg-a: rgba(126,84,240,.6); --bg-b: rgba(30,206,196,.34); --bg-c: rgba(236,92,208,.32); --bg-d: rgba(64,42,160,.6); --bg-dur: 18s;
+  --glass: rgba(31,18,71,.66); --glass-line: rgba(182,156,255,.28); --glass-blur: 12px;
+  --btn-bg: linear-gradient(120deg, #8B6BFF, #6E4BF0 50%, #B45CF0);
+  --btn-shadow: 0 10px 24px -10px rgba(139,107,255,.8), inset 0 1px 0 rgba(255,255,255,.3);
+  --rule: linear-gradient(90deg, #B69CFF, #7EE8D8 55%, rgba(126,232,216,0));
+  --glow: #8B6BFF; --shadow-soft: 0 14px 30px -20px rgba(0,0,0,.8);
+  --item-r: 20px; --photo-r: 14px; --search-r: 28px;
+  --emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 96'%3E %3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23E9DEFF'/%3E%3Cstop offset='.55' stop-color='%23B69CFF'/%3E%3Cstop offset='1' stop-color='%237EE8D8'/%3E%3C/linearGradient%3E %3Cmask id='m'%3E%3Crect width='120' height='96' fill='white'/%3E%3Ccircle cx='72' cy='40' r='30' fill='black'/%3E%3C/mask%3E%3C/defs%3E %3Ccircle cx='50' cy='50' r='34' fill='url(%23g)' mask='url(%23m)'/%3E %3Cpath d='M92 11 Q92 18 99 18 Q92 18 92 25 Q92 18 85 18 Q92 18 92 11 Z' fill='%23FFFFFF'/%3E%3Cpath d='M106 45.5 Q106 50 110.5 50 Q106 50 106 54.5 Q106 50 101.5 50 Q106 50 106 45.5 Z' fill='%237EE8D8'/%3E%3Cpath d='M80 72.5 Q80 78 85.5 78 Q80 78 80 83.5 Q80 78 74.5 78 Q80 78 80 72.5 Z' fill='%23F5A8FF'/%3E%3Cpath d='M22 10.5 Q22 14 25.5 14 Q22 14 22 17.5 Q22 14 18.5 14 Q22 14 22 10.5 Z' fill='%23FFFFFF'/%3E%3C/svg%3E"); --emblem-w: 120px; --emblem-h: 96px;
+  --h1-size: 34px; --h1-ls: .01em; --cat-tt: none; --cat-ls: .01em; --cat-size: 24px;
+}
+/* aurora ribbons sweeping across the top of the sky */
+html::before {
+  content: ""; position: fixed; left: -30%; right: -30%; top: -8%; height: 62%; z-index: -2; pointer-events: none;
+  background:
+    linear-gradient(100deg, transparent 6%, rgba(72,255,214,.20) 30%, rgba(160,120,255,.26) 52%, rgba(255,110,220,.16) 70%, transparent 92%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 35%, #000 65%, transparent); mask-image: linear-gradient(180deg, transparent, #000 35%, #000 65%, transparent);
+  transform: skewY(-9deg); transform-origin: 0 0; animation: txAurora 15s ease-in-out infinite alternate;
+}
+html::after {
+  content: ""; position: fixed; left: -30%; right: -30%; top: 12%; height: 46%; z-index: -2; pointer-events: none;
+  background: linear-gradient(80deg, transparent 12%, rgba(120,255,235,.12) 38%, rgba(190,140,255,.2) 60%, transparent 90%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 35%, #000 65%, transparent); mask-image: linear-gradient(180deg, transparent, #000 35%, #000 65%, transparent);
+  transform: skewY(7deg); transform-origin: 100% 0; animation: txAurora 21s ease-in-out infinite alternate-reverse;
+}
+@keyframes txAurora { 0% { transform: translateX(-8%) skewY(-9deg); opacity: .55; } 100% { transform: translateX(8%) skewY(-4deg); opacity: 1; } }
+header h1, .cover-menu-word {
+  background: linear-gradient(100deg, #B69CFF, #7EE8D8 45%, #F5A8FF 75%, #B69CFF); background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: txShine 8s linear infinite;
+}
+header h1, .category-title, .cover-cafe-name, .cover-menu-word { font-style: italic; }
+.category-title { font-weight: 500; }
+
+.cover-border {
+  --cover-card: rgba(26,15,60,.7);
+  max-width: 366px; padding: 50px 28px 42px; border: 1.5px solid transparent; border-radius: 34px;
+  background: linear-gradient(var(--cover-card), var(--cover-card)) padding-box, linear-gradient(120deg, #8B6BFF, #7EE8D8, #F5A8FF, #8B6BFF) border-box;
+  /* static gradient border on purpose: an animated one under backdrop-filter is costly on low-end phones */
+  box-shadow: 0 34px 80px -30px rgba(0,0,0,.9), 0 0 70px -20px rgba(139,107,255,.55);
+}
+.cover-cafe-name { font-size: 19px; color: #B69CFF; margin-bottom: 4px; }
+.cover-menu-word { font-size: 60px; letter-spacing: .01em; text-transform: none; margin-bottom: 16px; font-weight: 500; }
+.cover-meta .cover-hours { color: #C9F4EC; }
