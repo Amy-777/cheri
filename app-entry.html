@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>xyzzy</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #171A21; --teal: #E63976; --amber: #FF9770;
+    --danger: #FF8A80;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--ink); overflow: hidden; }
+  body {
+    font-family: 'Inter', sans-serif; color: #fff;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(circle at 25% 18%, rgba(255,151,112,.32), transparent 55%),
+      radial-gradient(circle at 78% 82%, rgba(230,57,118,.38), transparent 55%),
+      var(--ink);
+  }
+  h1, h2, .brand { font-family: 'Space Grotesk', sans-serif; }
+
+  /* ---- Splash: logo fades in, holds, fades out ---- */
+  #splash {
+    position: fixed; inset: 0; z-index: 50; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    opacity: 0; animation: splashFade 1900ms ease forwards;
+  }
+  #splash .logo-mark { font-size: 38px; font-weight: 700; letter-spacing: -.01em; }
+  #splash .logo-mark span { color: var(--amber); }
+  #splash .logo-tag { font-size: 12px; color: #9AA0AC; letter-spacing: .05em; text-transform: uppercase; }
+  @keyframes splashFade {
+    0%   { opacity: 0; transform: scale(.94); }
+    20%  { opacity: 1; transform: scale(1); }
+    75%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.02); }
+  }
+
+  /* ---- Liquid glass card (same technique as the website's landing page) ---- */
+  .liquid-glass {
+    position: relative; isolation: isolate; overflow: hidden;
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  }
+  .liquid-glass::after {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+    box-shadow:
+      0 0 8px rgba(0,0,0,.03), 0 2px 6px rgba(0,0,0,.08),
+      inset 3px 3px .5px -3.5px rgba(255,255,255,.09), inset -3px -3px .5px -3.5px rgba(255,255,255,.85),
+      inset 1px 1px 1px -.5px rgba(255,255,255,.6), inset -1px -1px 1px -.5px rgba(255,255,255,.6),
+      inset 0 0 6px 6px rgba(255,255,255,.12), inset 0 0 2px 2px rgba(255,255,255,.06),
+      0 0 12px rgba(0,0,0,.15);
+  }
+  .liquid-glass > * { position: relative; z-index: 2; }
+
+  /* ---- Auth screen ---- */
+  #auth-screen {
+    position: fixed; inset: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; pointer-events: none; transition: opacity .45s ease;
+  }
+  #auth-screen.show { opacity: 1; pointer-events: auto; }
+  .auth-card {
+    width: 100%; max-width: 380px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 28px; padding: 32px 26px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.45);
+  }
+  .auth-logo { text-align: center; font-size: 21px; font-weight: 700; margin-bottom: 4px; }
+  .auth-logo span { color: var(--amber); }
+  .auth-sub { text-align: center; font-size: 12.5px; color: #9AA0AC; margin-bottom: 24px; }
+
+  /* ---- iOS-style segmented control with a sliding pill ---- */
+  .segmented {
+    position: relative; display: flex;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px; padding: 3px; margin-bottom: 22px;
+  }
+  .seg-pill {
+    position: absolute; top: 3px; bottom: 3px; left: 3px;
+    width: calc(33.333% - 2px);
+    background: #fff; border-radius: 11px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.22);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  .seg-tab {
+    position: relative; z-index: 1; flex: 1; text-align: center;
+    padding: 9px 4px; font-size: 12px; font-weight: 600; cursor: pointer;
+    color: #D4D6DB; transition: color .2s ease; user-select: none;
+  }
+  .seg-tab.active { color: var(--ink); }
+  .seg-tab:active { opacity: .75; }
+
+  .kind-switch { display: flex; gap: 4px; padding: 3px; margin: 0 auto 14px; width: 190px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 999px; }
+  .kind-switch button { flex: 1; border: 0; background: transparent; color: #D4D6DB; font: 600 12.5px 'Inter', sans-serif; padding: 7px 0; border-radius: 999px; cursor: pointer; }
+  .kind-switch button[aria-selected="true"] { background: var(--amber); color: #fff; }
+  .kind-switch[data-kind="hotel"] button[aria-selected="true"] { background: #12905A; }
+  .btn.hotel-mode { background: #12905A !important; color: #fff !important; }
+  form { display: none; flex-direction: column; gap: 13px; }
+  form.active { display: flex; }
+  label { font-size: 11.5px; font-weight: 600; color: #9AA0AC; margin-bottom: 4px; display: block; }
+  input {
+    width: 100%; font-family: 'Inter', sans-serif; font-size: 14.5px; padding: 12px 14px;
+    border-radius: 14px; border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.06); color: #fff;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  input::placeholder { color: #6B7280; }
+  input:focus { outline: none; border-color: var(--teal); background: rgba(255,255,255,.1); }
+  .hint { font-size: 11px; color: #6B7280; margin-top: 3px; }
+
+  .btn {
+    all: unset; box-sizing: border-box; width: 100%; text-align: center;
+    font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 700;
+    padding: 13px; border-radius: 14px; cursor: pointer; margin-top: 4px;
+    background: linear-gradient(135deg, var(--teal), #C22F63); color: #fff;
+    transition: transform .1s ease, opacity .15s ease;
+  }
+  .btn:active { transform: scale(.97); opacity: .85; }
+  .btn:disabled { opacity: .5; pointer-events: none; }
+
+  .error { font-size: 12px; color: var(--danger); display: none; margin-top: -4px; }
+  .error.show { display: block; }
+  .forgot-link { text-align: center; margin-top: 12px; font-size: 12px; color: #9AA0AC; text-decoration: underline; cursor: pointer; }
+
+  /* ---- Forgot password modal ---- */
+  #forgot-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    align-items: center; justify-content: center; padding: 20px;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+  }
+  #forgot-overlay .modal {
+    background: #1E222B; border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; color: #fff;
+  }
+  #forgot-overlay h2 { font-size: 16px; margin: 0 0 14px; }
+  #forgot-overlay p { font-size: 12.5px; color: #9AA0AC; margin: 0 0 14px; }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logo-mark">xyzzy<span>.</span></div>
+  <div class="logo-tag">Table service, automated</div>
+</div>
+
+<div id="auth-screen">
+  <div class="auth-card liquid-glass">
+    <div class="auth-logo">xyzzy<span>.</span></div>
+    <div class="auth-sub" id="auth-sub">Log in or create your cafe's account</div>
+
+    <div class="kind-switch" id="kind-switch" data-kind="cafe" role="tablist" aria-label="Café or Hotel">
+      <button type="button" data-kind="cafe" aria-selected="true">Café</button>
+      <button type="button" data-kind="hotel" aria-selected="false">Hotel</button>
+    </div>
+
+    <div class="segmented" id="segmented">
+      <div class="seg-pill" id="seg-pill"></div>
+      <div class="seg-tab active" data-form="signup-form">Sign up</div>
+      <div class="seg-tab" data-form="admin-login-form">Admin</div>
+      <div class="seg-tab" data-form="user-login-form">Staff</div>
+    </div>
+
+    <form id="signup-form" class="active">
+      <div>
+        <label>Your name</label>
+        <input id="signup-name" placeholder="Rahul Sharma">
+      </div>
+      <div>
+        <label>Email or phone number</label>
+        <input id="signup-identifier" placeholder="you@cafe.com or 98765 43210">
+        <div class="hint">Either works — you'll use the same one to log in.</div>
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="signup-password" type="password" placeholder="At least 8 characters">
+      </div>
+      <p class="error" id="signup-error"></p>
+      <button type="submit" class="btn">Create account</button>
+    </form>
+
+    <form id="admin-login-form">
+      <div>
+        <label>Email or phone number</label>
+        <input id="admin-identifier" placeholder="you@cafe.com or 98765 43210">
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="admin-password" type="password" placeholder="Your password">
+      </div>
+      <p class="error" id="admin-error"></p>
+      <button type="submit" class="btn">Log in as admin</button>
+      <div class="forgot-link" onclick="openForgotPassword()">Forgot password?</div>
+    </form>
+
+    <form id="user-login-form">
+      <div>
+        <label>Email or phone number</label>
+        <input id="user-identifier" placeholder="Given by your cafe admin">
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="user-password" type="password" placeholder="Your password">
+      </div>
+      <p class="error" id="user-error"></p>
+      <button type="submit" class="btn">Log in</button>
+      <div class="forgot-link" onclick="openForgotPassword()">Forgot password?</div>
+    </form>
+  </div>
+</div>
+
+<div id="forgot-overlay">
+  <div class="modal">
+    <h2>Reset your password</h2>
+    <div id="forgot-step-1">
+      <p>Enter the email on your account — we'll send a reset code.</p>
+      <label>Email</label>
+      <input id="forgot-email" type="email" placeholder="you@cafe.com" style="margin-bottom:14px;">
+      <button class="btn" onclick="sendForgotPasswordCode()">Send reset code</button>
+    </div>
+    <div id="forgot-step-2" style="display:none;">
+      <p>Check your email for a code, then set a new password below.</p>
+      <label>Code</label>
+      <input id="forgot-code" placeholder="6-digit code" style="margin-bottom:12px;">
+      <label>New password</label>
+      <input id="forgot-new-password" type="password" placeholder="At least 8 characters" style="margin-bottom:14px;">
+      <button class="btn" onclick="submitPasswordReset()">Reset password</button>
+    </div>
+    <p class="error" id="forgot-error" style="margin-top:10px;"></p>
+    <div class="forgot-link" onclick="closeForgotPassword()" style="margin-top:14px;">Cancel</div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://xyzzy-backend.onrender.com";
+
+/* ---- Segmented control (sliding pill, iOS-style) ---- */
+const segmented = document.getElementById('segmented');
+const segPill = document.getElementById('seg-pill');
+function setActiveTab(formId) {
+  const tabs = [...segmented.querySelectorAll('.seg-tab')];
+  const idx = tabs.findIndex(t => t.dataset.form === formId);
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.form === formId));
+  segPill.style.transform = `translateX(${idx * 100}%)`;
+  document.querySelectorAll('form').forEach(f => f.classList.remove('active'));
+  document.getElementById(formId).classList.add('active');
+  document.getElementById('kind-switch').style.display = '';   // Café / Hotel: picks which side you log in to or create
+  document.getElementById('auth-sub').textContent = formId === 'signup-form' ? (KIND === 'hotel' ? "Create your hotel's account" : "Create your cafe's account") : (KIND === 'hotel' ? 'Log in to your hotel account' : 'Log in to your café account');
+}
+segmented.querySelectorAll('.seg-tab').forEach(tab => {
+  tab.addEventListener('click', () => setActiveTab(tab.dataset.form));
+});
+
+function showError(id, message) {
+  const el = document.getElementById(id);
+  el.textContent = message;
+  el.classList.add('show');
+}
+function clearError(id) { document.getElementById(id).classList.remove('show'); }
+function looksLikeEmail(value) { return value.includes('@'); }
+
+async function apiPost(path, body) {
+  const res = await fetch(API_BASE + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || 'Something went wrong');
+  return data;
+}
+
+let KIND = 'cafe';
+try { if (localStorage.getItem('login_kind') === 'hotel') KIND = 'hotel'; } catch (e) {}
+function setKind(k) {
+  KIND = k; try { localStorage.setItem('login_kind', k); } catch (e) {}
+  const sw = document.getElementById('kind-switch'); sw.dataset.kind = k;
+  sw.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b.dataset.kind === k ? 'true' : 'false'));
+  const su = document.getElementById('signup-form').classList.contains('active');
+  document.getElementById('auth-sub').textContent = su ? (k === 'hotel' ? "Create your hotel's account" : "Create your cafe's account") : (k === 'hotel' ? 'Log in to your hotel account' : 'Log in to your café account');
+  document.querySelectorAll('#auth-screen .btn').forEach(b => b.classList.toggle('hotel-mode', k === 'hotel'));
+}
+document.getElementById('kind-switch').addEventListener('click', e => { const b = e.target.closest('button[data-kind]'); if (b) setKind(b.dataset.kind); });
+setKind(KIND);
+
+function storeSessionAndRedirect(data) {
+  localStorage.setItem('access_token', data.access_token);
+  localStorage.setItem('role', data.role);
+  localStorage.setItem('cafe_id', data.cafe_id || '');
+  if (data.role === 'owner' && !data.has_completed_cafe_setup) {
+    window.location.href = 'cafe-setup.html';
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
+
+document.getElementById('signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError('signup-error');
+  const name = document.getElementById('signup-name').value.trim();
+  const identifier = document.getElementById('signup-identifier').value.trim();
+  const password = document.getElementById('signup-password').value;
+  if (!name || !identifier || password.length < 8) {
+    showError('signup-error', 'Fill in all fields — password needs at least 8 characters.');
+    return;
+  }
+  const payload = { name, password, business_type: KIND };
+  if (looksLikeEmail(identifier)) payload.email = identifier; else payload.phone = identifier;
+  const btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true;
+  try {
+    const data = await apiPost('/auth/signup', payload);
+    storeSessionAndRedirect(data);
+  } catch (err) {
+    showError('signup-error', err.message);
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError('admin-error');
+  const identifier = document.getElementById('admin-identifier').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true;
+  try {
+    const data = await apiPost('/auth/login', { identifier, password, business_type: KIND });
+    if (data.role !== 'owner') {
+      showError('admin-error', 'This login is for cafe admins. Use Staff Login instead.');
+      btn.disabled = false;
+      return;
+    }
+    storeSessionAndRedirect(data);
+  } catch (err) {
+    showError('admin-error', err.message);
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('user-login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError('user-error');
+  const identifier = document.getElementById('user-identifier').value.trim();
+  const password = document.getElementById('user-password').value;
+  const btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true;
+  try {
+    const data = await apiPost('/auth/login', { identifier, password, business_type: KIND });
+    if (data.role !== 'waiter') {
+      showError('user-error', 'This login is for waiters. Use Admin Login instead.');
+      btn.disabled = false;
+      return;
+    }
+    storeSessionAndRedirect(data);
+  } catch (err) {
+    showError('user-error', err.message);
+    btn.disabled = false;
+  }
+});
+
+function openForgotPassword() {
+  document.getElementById('forgot-step-1').style.display = 'block';
+  document.getElementById('forgot-step-2').style.display = 'none';
+  document.getElementById('forgot-error').classList.remove('show');
+  document.getElementById('forgot-email').value = '';
+  document.getElementById('forgot-overlay').style.display = 'flex';
+}
+function closeForgotPassword() {
+  document.getElementById('forgot-overlay').style.display = 'none';
+}
+function showForgotError(msg) {
+  const el = document.getElementById('forgot-error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+async function sendForgotPasswordCode() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { showForgotError('Enter your email.'); return; }
+  document.getElementById('forgot-error').classList.remove('show');
+  try {
+    await apiPost('/auth/forgot-password', { email });
+    document.getElementById('forgot-step-1').style.display = 'none';
+    document.getElementById('forgot-step-2').style.display = 'block';
+  } catch (err) { showForgotError(err.message); }
+}
+async function submitPasswordReset() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const code = document.getElementById('forgot-code').value.trim();
+  const new_password = document.getElementById('forgot-new-password').value;
+  if (!code || new_password.length < 8) { showForgotError('Enter the code and a password of at least 8 characters.'); return; }
+  document.getElementById('forgot-error').classList.remove('show');
+  try {
+    await apiPost('/auth/reset-password', { email, code, new_password });
+    closeForgotPassword();
+    setActiveTab('admin-login-form');
+    document.getElementById('admin-identifier').value = email;
+  } catch (err) { showForgotError(err.message); }
+}
+
+/* ---- Boot sequence ----
+   The splash plays for real (logo fade in → hold → fade out) regardless of
+   how fast the token check finishes, so it reads as a branded moment, not a
+   flash. In parallel, we verify any saved token is still actually valid
+   (not just present) before trusting it — an expired/invalid token falls
+   through to the login screen instead of handing the person a broken
+   dashboard. */
+async function boot() {
+  const token = localStorage.getItem('access_token');
+  let goStraightToDashboard = false;
+
+  if (token) {
+    // A saved login is only thrown away when the server clearly says it is invalid (401).
+    // A slow or sleeping server (502/503/timeout/offline) must NOT log anyone out.
+    goStraightToDashboard = true;
+    try {
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 8000);
+      const res = await fetch(API_BASE + '/auth/refresh', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, signal: ctl.signal });
+      clearTimeout(to);
+      if (res.ok) {
+        const d = await res.json().catch(() => null);
+        if (d && d.access_token) localStorage.setItem('access_token', d.access_token);   // slide the session forward
+      } else if (res.status === 401) {
+        goStraightToDashboard = false;
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('cafe_id');
+      }
+    } catch (e) { /* offline / server waking up — keep the saved login */ }
+  }
+
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    if (goStraightToDashboard) {
+      window.location.href = 'dashboard.html';
+    } else {
+      document.getElementById('auth-screen').classList.add('show');
+    }
+  }, 1900);
+}
+boot();
+</script>
+</body>
+</html>

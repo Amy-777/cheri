@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- The base structural CSS (fonts, layout, generic component rules) always
+     loads — it's what makes every template's markup actually work. Each
+     template then loads on top of it as an additive skin (colors, card
+     styling, decorative touches), swapped at runtime based on the cafe's
+     chosen template — see loadMenu() below, which sets this link's href
+     once it knows which one to use. -->
+<link rel="stylesheet" href="templates/default.css">
+<!-- The template skin loads as an ADDITIONAL layer on top of default.css
+     above, never replacing it — default.css owns all structural layout
+     (spacing, cards, grid); a template only adds color/decoration on top.
+     Empty href = no extra skin (plain default look). -->
+<link id="template-skin-css" rel="stylesheet" href="">
+<!-- The cafe's customizable About page: own engine + own stylesheet, independent of the menu template. -->
+<link rel="stylesheet" href="about-page.css">
+<script src="amenities.js"></script>
+<script src="about-page.js"></script>
+<script src="about-hotel.js" defer></script>
+<script src="templates/theme-fx.js"></script>
+<style id="room-css">
+  /* ---- Hotel room page: one big Call Room Service button on top ---- */
+  .room-call { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 14px; width: calc(100% - 32px); margin: 4px 16px 14px; padding: 18px 20px; border-radius: 20px;
+    background: var(--olive, #171A21); color: var(--on-primary, #fff); box-shadow: 0 10px 28px rgba(0,0,0,.18); -webkit-tap-highlight-color: transparent; transition: transform .12s ease, opacity .12s ease; }
+  .room-call:active { transform: scale(.98); opacity: .92; }
+  .room-call:disabled { opacity: .75; cursor: default; }
+  .room-call.sent { background: #1E8E3E; color: #fff; }
+  .room-call .rc-ic { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.18); display: grid; place-items: center; }
+  .room-call .rc-txt { display: flex; flex-direction: column; gap: 3px; text-align: left; }
+  .room-call .rc-main { font: 800 19px/1.15 var(--font-head, 'Space Grotesk', sans-serif); letter-spacing: .01em; }
+  .room-call .rc-sub { font-size: 12.5px; opacity: .85; }
+  .room-note { margin: 0 16px 16px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--glass-line, var(--border)); background: var(--glass, transparent); color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; text-align: center; }
+  body.is-room #call-btn { display: none; }
+  body.no-dining .search-wrap, body.no-dining #category-scrollbar, body.no-dining #menu-wrap, body.no-dining #fb-menu-slot, body.no-dining #status-banner-slot,
+  body.no-dining .panel-nav-dots, body.no-dining .bottom-bar, body.no-dining .menu-filters { display: none !important; }
+</style>
+<style>
+  /* CATEGORY heading (above subcategories): bigger, bolder, centred between two rules */
+  .menu-section { margin: 34px 0 6px; }
+  .menu-section-title { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; text-align: center;
+    font-family: var(--font-head, serif); font-weight: 800; font-size: 28px; line-height: 1.15; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); }
+  .menu-section-title span { flex: 0 1 auto; max-width: 78%; overflow-wrap: anywhere; }
+  .menu-section-title::before, .menu-section-title::after { content: ""; flex: 1 1 0; height: 2px; min-width: 18px; border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--terracotta, currentColor)); opacity: .85; }
+  .menu-section-title::after { background: linear-gradient(90deg, var(--terracotta, currentColor), transparent); }
+  .category-block.untitled { margin-top: 4px; }
+  .category-block.untitled:not(:first-child) { border-top: 1px dashed var(--glass-line, var(--border)); padding-top: 14px; }
+</style>
+<style>
+  /* ---- Veg / non-veg marks, hot / cold, sizes ---- */
+  .diet-mark { display: inline-grid; place-items: center; width: 13px; height: 13px; border: 1.5px solid currentColor; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: #fff; flex: 0 0 auto; }
+  .diet-mark::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .diet-mark.veg { color: #1E8E3E; } .diet-mark.egg { color: #C77700; }
+  .diet-mark.nonveg { color: #B3261E; }
+  .diet-mark.nonveg::after { border-radius: 0; width: 0; height: 0; background: none; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 7px solid currentColor; }
+  .mi-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .mi-tag { font-size: 11px; font-weight: 600; line-height: 1; padding: 4px 7px; border-radius: 999px; border: 1px solid var(--glass-line, var(--border)); color: var(--text-secondary); white-space: nowrap; }
+  .mi-tag.hot { color: #C2410C; color: color-mix(in srgb, #EA580C 55%, var(--ink)); border-color: rgba(194,65,12,.35); } .mi-tag.cold { color: #0369A1; color: color-mix(in srgb, #0284C7 55%, var(--ink)); border-color: rgba(3,105,161,.35); }
+  .mi-tag.meat { color: #9F1239; color: color-mix(in srgb, #E11D48 50%, var(--ink)); border-color: rgba(225,29,72,.4); }
+  #vp-backdrop { z-index: 90; }
+  /* filter chips under the search bar */
+  .menu-filters { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 2px; scrollbar-width: none; }
+  .menu-filters::-webkit-scrollbar { display: none; }
+  .mf-chip { all: unset; cursor: pointer; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; font: 600 12.5px/1 var(--font-body, sans-serif);
+    color: var(--ink); background: var(--glass, var(--paper)); border: 1px solid var(--glass-line, var(--border)); -webkit-tap-highlight-color: transparent; }
+  .mf-chip[aria-pressed="true"] { background: var(--olive); border-color: var(--olive); color: var(--on-primary, #fff); }
+  .mf-chip[aria-pressed="true"] .diet-mark { background: #fff; }
+  .mf-sub { padding-top: 4px; }
+  .mf-sub .mf-chip { font-size: 12px; padding: 6px 10px; }
+  /* size / hot-cold picker */
+  .vp-sec { margin: 4px 0 16px; }
+  .vp-q { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+  .vp-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .vp-opt { all: unset; cursor: pointer; padding: 11px 15px; border-radius: 14px; border: 1.5px solid var(--glass-line, var(--border)); color: var(--ink); font-weight: 600; font-size: 14px; display: flex; flex-direction: column; gap: 3px; min-width: 64px; text-align: center; }
+  .vp-opt small { font-weight: 500; color: var(--text-secondary); font-size: 12px; }
+  .vp-opt[aria-pressed="true"] { border-color: var(--olive); box-shadow: inset 0 0 0 1px var(--olive); background: var(--olive-soft, transparent); }
+  .vp-add { width: 100%; margin-top: 6px; }
+</style>
+<style id="bill-fx">
+  #bill-ask { margin-top: 14px; }
+  .bill-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 16px; border-radius: 14px; border: 1.5px solid var(--ink, #171A21); background: transparent; color: var(--ink, #171A21); font: 700 14px 'Inter', sans-serif; cursor: pointer; transition: background .2s, color .2s, transform .15s; }
+  .bill-btn:hover:not(:disabled) { background: var(--ink, #171A21); color: #fff; }
+  .bill-btn:active:not(:disabled) { transform: scale(.98); }
+  .bill-btn:disabled { opacity: .55; cursor: default; }
+  .bill-hint { font-size: 11.5px; color: var(--text-secondary); text-align: center; margin-top: 7px; }
+  .bill-ok { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: var(--olive-soft, #E8F3E8); color: var(--olive-dark, #2F6B3A); font-size: 13px; line-height: 1.45; }
+  .bill-ok b { display: block; font-size: 14px; }
+  .bill-ok svg { flex: none; margin-top: 2px; }
+</style>
+<style id="fc-fx">
+  /* ---- carousels: Today's Specials + Bestsellers ---- */
+  .fc-wrap { margin: 6px 0 18px; }
+  .fc-head { display: flex; align-items: center; gap: 10px; padding: 0 2px 10px; }
+  .fc-head h2 { margin: 0; font-size: 20px; line-height: 1.2; }
+  .fc-count { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: rgba(232,115,26,.14); color: #B65410; }
+  .fc-track { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; padding: 2px 2px 26px; margin: 0 -2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x pan-y; }
+  .fc-nav { display: none; }
+  @media (hover: hover) and (pointer: fine) { .fc-wrap { position: relative; } .fc-nav { display: flex; position: absolute; top: 46%; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255,255,255,.95); color: #222; box-shadow: 0 2px 10px rgba(0,0,0,.25); align-items: center; justify-content: center; font-size: 20px; cursor: pointer; z-index: 3; } .fc-nav.l { left: 2px; } .fc-nav.r { right: 2px; } .fc-nav[hidden] { display: none; } }
+  .fc-track::-webkit-scrollbar { display: none; }
+  .fc-card { position: relative; flex: 0 0 min(44vw, 176px); scroll-snap-align: start; background: #fff; border-radius: 22px; padding: 8px 8px 12px; box-shadow: 0 6px 20px -10px rgba(0,0,0,.25); display: flex; flex-direction: column; }
+  .fc-media { position: relative; width: 100%; aspect-ratio: 1 / 1; }          /* square tile; the ADD button hangs off its bottom edge */
+  .fc-img { position: absolute; inset: 0; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #F3D9C4, #E9B98F); display: flex; align-items: center; justify-content: center; font: 700 44px/1 'Playfair Display', serif; color: rgba(255,255,255,.9); }
+  .fc-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .fc-img .mi-slide { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; }
+  .fc-noimg { align-self: flex-start; }
+  .fc-noimg .fc-body { padding-top: 8px; }
+  .fc-noimg .fc-price { margin-top: 0; }
+  .fc-noimg .fc-add { position: static; transform: none; align-self: flex-start; margin-top: 6px; }
+  .fc-add { position: absolute; left: 50%; bottom: -19px; transform: translateX(-50%); z-index: 2; display: flex; align-items: center; justify-content: center; min-width: 84px; height: 38px; border-radius: 12px; border: 1.5px solid #E8731A; background: #fff; color: #C95A0B; font: 800 14px 'Inter', sans-serif; letter-spacing: .05em; cursor: pointer; box-shadow: 0 5px 12px -5px rgba(0,0,0,.35); padding: 0; }
+  .fc-add button { all: unset; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+  .fc-add .q { min-width: 18px; text-align: center; }
+  .fc-body { padding: 28px 6px 0; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .fc-name { margin: 0; font: 700 15px/1.25 'Inter', sans-serif; color: #1a1d24; }
+  .fc-price { margin-top: auto; font: 500 13px 'Inter', sans-serif; color: #6B7280; }
+  .fc-price b { font-weight: 700; color: #1a1d24; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div id="pre-loading" class="loading">Loading menu…</div>
+<div id="error-state" class="error-state" style="display:none;"></div>
+
+<!-- ==== Cover card → flip → swipeable menu ====
+     On load we fetch the cafe's data, populate BOTH faces (the title-card
+     cover AND the menu behind it) while everything is still invisible,
+     then reveal the cover, hold it for ~1.4s, and 3D-flip the whole stage
+     to land on the menu. Nothing here is template-specific — it uses the
+     same default.css tokens (fonts/colors) as the rest of the menu, so a
+     cafe's chosen template still applies once flipped in. -->
+<div class="flip-stage" id="flip-stage" style="display:none;">
+  <div class="flipper" id="flipper">
+
+    <!-- FRONT: title card -->
+    <div class="cover-face" id="cover-face">
+      <div class="cover-border">
+        <div class="cover-cafe-name" id="cover-cafe-name">—</div>
+        <h1 class="cover-menu-word">Menu</h1>
+        <div class="cover-illustration">
+          <svg viewBox="0 0 100 84" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 78 Q50 88 94 78"/>
+            <path d="M13 78 L18 54 Q50 60 82 54 L87 78"/>
+            <rect x="22" y="32" width="11" height="22" rx="1.5"/>
+            <rect x="42" y="24" width="9" height="30" rx="2"/>
+            <path d="M44.5 24 V15 Q44.5 11 46.5 11 Q48.5 11 48.5 15 V24"/>
+            <path d="M60 42 L65 54 L73 54 L78 42 Z"/>
+            <line x1="69" y1="54" x2="69" y2="61"/>
+            <line x1="64" y1="61" x2="74" y2="61"/>
+          </svg>
+        </div>
+        <div class="cover-meta">
+          <div class="cover-hours" id="cover-hours"></div>
+          <div class="cover-address" id="cover-address"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACK: the actual app (order page ← menu → about, swipeable) -->
+    <div class="app-face" id="app-face">
+
+      <div class="carousel" id="carousel">
+        <div class="carousel-track" id="carousel-track">
+
+          <!-- Swipe RIGHT from the menu lands here: order details + total + payment QR -->
+          <section class="carousel-panel side-page" id="panel-order">
+            <h2 class="side-page-title">Your Order</h2>
+            <p class="side-page-sub">Review your order, then pay using the QR below or ask your waiter.</p>
+
+            <div id="order-history-wrap" style="display:none; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+              <div style="font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-secondary); margin-bottom:8px;">Ordered so far</div>
+              <div id="order-history-lines"></div>
+              <div style="display:flex; justify-content:space-between; font-weight:700; font-size:14px; padding-top:8px; margin-top:4px; border-top:1px dashed var(--border);"><span>Subtotal</span><span id="order-history-total-amt">₹0</span></div>
+              <div id="bill-ask"></div>
+            </div>
+
+            <div class="order-page-lines" id="order-page-lines"></div>
+            <div class="order-page-total"><span>Total</span><span id="order-page-total-amt">₹0</span></div>
+            <label class="note-label" for="order-note">Message for the waiter (optional)</label>
+            <textarea id="order-note" class="note-input" rows="2" placeholder="e.g. less sugar, no onions…"></textarea>
+            <button class="place-order-btn" id="place-order-btn" onclick="placeOrder()">Confirm order</button>
+            <div class="order-qr-wrap" id="order-qr-wrap" style="display:none;">
+              <img id="order-qr-img" src="" alt="Payment QR code">
+              <div class="order-qr-note">Scan to pay — show your confirmation to the waiter.</div>
+            </div>
+            <div id="fb-order-slot"></div>
+          </section>
+
+          <!-- Default view -->
+          <section class="carousel-panel panel-menu" id="panel-menu">
+            <header>
+              <div class="header-top">
+                <img id="cafe-logo" class="header-mark" style="display:none;" alt="">
+                <div id="cafe-logo-fallback" class="header-mark">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                </div>
+                <button class="bell-btn" id="bell-btn" onclick="toggleNotifications()" aria-label="Notifications">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                  <span class="bell-badge" id="bell-badge"></span>
+                </button>
+              </div>
+              <div class="header-center">
+                <h1 id="cafe-name">—</h1>
+                <div class="header-subtitle">Café &amp; Kitchen</div>
+                <div class="table-chip" id="table-chip"></div>
+              </div>
+            </header>
+
+            <div class="search-wrap">
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input id="search-input" type="text" placeholder="Search menu" oninput="onSearchInput()">
+                <button class="search-clear" id="search-clear" onclick="clearSearch()" aria-label="Clear search">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="status-banner-slot"></div>
+
+            <div class="category-scrollbar" id="category-scrollbar"></div>
+
+            <div class="menu-wrap" id="menu-wrap"></div>
+            <div id="fb-menu-slot"></div>
+          </section>
+
+          <!-- Swipe LEFT from the menu lands here: the cafe's about section -->
+          <section class="carousel-panel side-page" id="panel-about">
+            <h2 class="side-page-title">About</h2>
+            <p class="side-page-sub" id="about-cafe-name"></p>
+            <div id="panel-about-body"></div>
+          </section>
+
+        </div>
+      </div>
+
+      <div class="panel-nav-dots" id="panel-nav-dots">
+        <span onclick="goToPanel(0)" aria-label="Order"></span>
+        <span class="active" onclick="goToPanel(1)" aria-label="Menu"></span>
+        <span onclick="goToPanel(2)" aria-label="About"></span>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pill-btn call-pill" id="call-btn" onclick="ringWaiter()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span id="call-btn-label">Call Waiter</span>
+        </button>
+        <button class="pill-btn cart-pill" id="cart-btn" onclick="goToPanel(0)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
+          <span>Your Order</span>
+          <span class="cart-badge" id="cart-badge" style="display:none;"></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="notif-backdrop" onclick="if(event.target===this) closeNotifications()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top-row">
+      <h2>Notifications</h2>
+      <button class="close-sheet" onclick="closeNotifications()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div id="notif-lines"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==== Veg / non-veg, hot / cold, sizes ====
+   Item fields from the dashboard: diet ('veg' | 'egg' | 'nonveg'), contains (['Chicken','Fish',…]),
+   temps (['hot','cold']), sizes ([{name:'Small', price:120}, …]). Items with more than one
+   size, or offered both hot and cold, open a small picker when added; each choice is its own
+   line in the order ("Cold Coffee · Large · Cold"). */
+// The backend may hand these back as arrays, JSON strings or "a, b" text — accept all three.
+function asList(v) {
+  if (Array.isArray(v)) return v;
+  if (typeof v === 'string' && v.trim()) { try { const j = JSON.parse(v); if (Array.isArray(j)) return j; } catch (e) {} return v.split(',').map(x => x.trim()).filter(Boolean); }
+  return [];
+}
+const itemSizes = i => asList(i.sizes).map(s => typeof s === 'string' ? { name: s, price: null } : s).filter(s => s && s.name);
+const itemTemps = i => asList(i.temps).map(t => String(t).toLowerCase()).filter(t => t === 'hot' || t === 'cold');
+const itemContains = i => asList(i.contains).map(String).filter(Boolean);
+const itemKinds = i => asList(i.kinds).map(k => typeof k === 'string' ? { name: k, price: null, mark: null } : k).filter(k => k && k.name);
+const itemTempPrices = i => (i && i.temp_prices && typeof i.temp_prices === 'object') ? i.temp_prices : {};
+const itemCombos = i => (i && i.combo_prices && typeof i.combo_prices === 'object') ? i.combo_prices : {};
+const numOrNull = v => (v != null && v !== '' && isFinite(Number(v))) ? Number(v) : null;
+// How many of the three groups (type / size / hot-cold) a guest has to choose from.
+const groupsInUse = i => [itemKinds(i), itemSizes(i), itemTemps(i)].filter(g => g.length > 1).length;
+/* Add-ons: optional extras the cafe set up for a dish (item.addons = [{name, price}]). A guest can tick any number of
+   them; each is priced on top of the dish, and the order carries their names (items[].addons) for the server to price. */
+const itemAddons = i => asList(i && i.addons).map(a => typeof a === 'string' ? { name: a, price: 0 } : a).filter(a => a && a.name).map(a => ({ name: String(a.name), price: Number(a.price) || 0 }));
+const addonSum = list => (list || []).reduce((t, a) => t + (Number(a && a.price) || 0), 0);
+const addonNamesOf = i => asList(i && i.addons).map(a => typeof a === 'string' ? a : (a && a.name)).filter(Boolean).map(String);
+const hasChoice = i => groupsInUse(i) > 0 || itemAddons(i).length > 0;
+const comboKey = (k, s, t) => [k, s, t].map(x => String(x || '').trim().toLowerCase()).join('|');
+const kindMark = name => /^veg(etarian)?$/i.test(String(name).trim()) ? 'veg' : /^egg/i.test(String(name).trim()) ? 'egg' : 'nonveg';
+// The price of ONE specific choice — the same rule the server applies when the order arrives: one group in use ->
+// that option's own price; two or three -> the price of that exact combination; blank -> the item's own price.
+function choicePrice(item, kind, size, temp) {
+  const ks = itemKinds(item), ss = itemSizes(item), ts = itemTemps(item), base = Number(item.price), combos = itemCombos(item);
+  const ck = ks.length > 1 ? ks.find(k => k.name === kind) : ks[0], cs = ss.length > 1 ? ss.find(x => x.name === size) : ss[0];
+  const t = ts.length > 1 ? temp : ts[0], n = groupsInUse(item);
+  if (n >= 2 && Object.keys(combos).length) { const v = numOrNull(combos[comboKey(ck && ck.name, cs && cs.name, t)]); return v != null ? v : base; }
+  if (n >= 2) { const own = ss.length > 1 ? (cs && cs.price) : (ck && ck.price); const v = numOrNull(own); return v != null ? v : base; }
+  if (ks.length > 1) { const v = numOrNull(ck && ck.price); return v != null ? v : base; }
+  if (ss.length > 1) { const v = numOrNull(cs && cs.price); return v != null ? v : base; }
+  if (ts.length > 1) { const v = numOrNull(itemTempPrices(item)[t]); return v != null ? v : base; }
+  const lone = numOrNull(cs && cs.price), lone2 = numOrNull(ck && ck.price);
+  return lone != null ? lone : lone2 != null ? lone2 : base;
+}
+function priceChoices(i) {
+  const ks = itemKinds(i), ss = itemSizes(i), ts = itemTemps(i), out = [];
+  (ks.length > 1 ? ks : [ks[0] || null]).forEach(k => (ss.length > 1 ? ss : [ss[0] || null]).forEach(z => (ts.length > 1 ? ts : [ts[0] || null]).forEach(t => out.push(choicePrice(i, k && k.name, z && z.name, t)))));
+  return out.length ? out : [Number(i.price)];
+}
+const itemDietSet = i => { const set = new Set(); if (i && i.diet) set.add(i.diet); itemKinds(i).forEach(k => set.add(k.mark || kindMark(k.name))); return set; };
+const inrShort = n => '₹' + (Number.isInteger(n) ? n : n.toFixed(2));
+const sizePrice = (i, s) => (s && s.price != null && s.price !== '' && isFinite(Number(s.price))) ? Number(s.price) : Number(i.price);
+function dietMark(i) {
+  if (!i.diet) return '';
+  const label = i.diet === 'veg' ? 'Vegetarian' : i.diet === 'egg' ? 'Contains egg' : 'Non-vegetarian';
+  return `<span class="diet-mark ${i.diet}" role="img" aria-label="${label}" title="${label}"></span>`;
+}
+function itemTagsHtml(i) {
+  const tags = [];
+  itemContains(i).forEach(c => tags.push(`<span class="mi-tag meat">${escapeHtml(c)}</span>`));
+  itemTemps(i).forEach(t => tags.push(`<span class="mi-tag ${t}">${t === 'hot' ? '♨ Hot' : '❄ Cold'}</span>`));
+  const kd = itemKinds(i); if (kd.length) tags.push(`<span class="mi-tag">${kd.map(k => escapeHtml(k.name)).join(' · ')}</span>`);
+  if (itemAddons(i).length) tags.push(`<span class="mi-tag">+ Add-ons</span>`);
+  const sz = itemSizes(i);
+  if (sz.length) tags.push(`<span class="mi-tag">${sz.map(s => escapeHtml(s.name)).join(' · ')}</span>`);
+  return tags.length ? `<div class="mi-tags">${tags.join('')}</div>` : '';
+}
+function priceLabel(i) {
+  const ps = priceChoices(i), lo = Math.min(...ps), hi = Math.max(...ps);
+  return lo !== hi ? `${inrShort(lo)}–${hi}` : inrShort(lo);        // "₹100–140": lowest to highest across every option / combination
+}
+
+/* ---- filters under the search bar ---- */
+let dietFilter = '', tempFilter = '', meatFilter = '';
+function matchesFilters(i) {
+  const dset = itemDietSet(i);          // the dish's own mark PLUS the mark of every type it offers
+  if (dietFilter === 'veg' && !dset.has('veg')) return false;
+  if (dietFilter === 'nonveg' && !(dset.has('nonveg') || dset.has('egg'))) return false;
+  if (meatFilter && !itemContains(i).concat(itemKinds(i).map(k => k.name)).some(c => c.toLowerCase() === meatFilter.toLowerCase()) && !(meatFilter === 'Egg' && dset.has('egg'))) return false;
+  if (tempFilter && !itemTemps(i).includes(tempFilter)) return false;
+  return true;
+}
+function renderMenuFilters() {
+  const wrap = document.querySelector('.search-wrap'); if (!wrap) return;
+  let el = document.getElementById('menu-filters');
+  const anyDiet = menu.some(i => itemDietSet(i).size), anyTemp = menu.some(i => itemTemps(i).length);
+  if (!anyDiet && !anyTemp) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'menu-filters'; wrap.appendChild(el); }
+  const chip = (kind, val, cur, label) => `<button type="button" class="mf-chip" data-mf="${kind}:${val}" aria-pressed="${cur === val}">${label}</button>`;
+  const meats = [...new Set(menu.filter(i => { const d = itemDietSet(i); return d.has('nonveg') || d.has('egg'); }).flatMap(i => itemContains(i).concat(itemKinds(i).filter(k => (k.mark || kindMark(k.name)) === 'nonveg').map(k => k.name)).concat(itemDietSet(i).has('egg') ? ['Egg'] : [])))];
+  el.innerHTML = `<div class="menu-filters" role="group" aria-label="Filter the menu">
+      ${anyDiet ? chip('diet', 'veg', dietFilter, '<span class="diet-mark veg"></span>Veg') + chip('diet', 'nonveg', dietFilter, '<span class="diet-mark nonveg"></span>Non-veg') : ''}
+      ${anyTemp ? chip('temp', 'hot', tempFilter, '♨ Hot') + chip('temp', 'cold', tempFilter, '❄ Cold') : ''}
+    </div>
+    ${dietFilter === 'nonveg' && meats.length > 1 ? `<div class="menu-filters mf-sub" role="group" aria-label="Which meat">${chip('meat', '', meatFilter, 'All non-veg')}${meats.map(m => chip('meat', m, meatFilter, escapeHtml(m))).join('')}</div>` : ''}`;
+  if (typeof positionStickyBars === 'function') positionStickyBars();
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-mf]'); if (!c) return;
+  const [kind, val] = c.dataset.mf.split(':');
+  if (kind === 'diet') { dietFilter = dietFilter === val ? '' : val; meatFilter = ''; }
+  if (kind === 'temp') tempFilter = tempFilter === val ? '' : val;
+  if (kind === 'meat') meatFilter = val;
+  renderMenuFilters(); renderMenu();
+});
+
+/* ---- size / hot-cold picker ---- */
+let vpState = null;
+function openVariantPicker(item, sourceBtn) {
+  const kinds = itemKinds(item), sizes = itemSizes(item), temps = itemTemps(item);
+  vpState = { item, addons: [], kind: kinds.length > 1 ? kinds[0].name : null, size: sizes.length ? sizes[Math.min(1, sizes.length - 1)].name : null, temp: temps.length ? temps[0] : null, btn: sourceBtn };
+  if (!document.getElementById('vp-backdrop')) {
+    document.body.insertAdjacentHTML('beforeend', `<div class="sheet-backdrop" id="vp-backdrop" onclick="if (event.target === this) closeVariantPicker()">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="vp-title"><div class="sheet-handle"></div>
+        <div class="sheet-top-row"><h2 id="vp-title"></h2><button class="close-sheet" onclick="closeVariantPicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+        <div id="vp-body"></div></div></div>`);
+    document.getElementById('vp-body').addEventListener('click', e => {
+      const o = e.target.closest('[data-vp]');
+      if (o) {
+        const sep = o.dataset.vp.indexOf('|'), k = o.dataset.vp.slice(0, sep), v = o.dataset.vp.slice(sep + 1);
+        if (k === 'addon') vpState.addons = vpState.addons.includes(v) ? vpState.addons.filter(x => x !== v) : vpState.addons.concat(v);
+        else vpState[k] = v;
+        renderVariantPicker(); return;
+      }
+      if (e.target.closest('#vp-add')) {
+        const { item, kind, size, temp, btn } = vpState;
+        addVariant(item, size, temp, 1, btn, kind, itemAddons(item).filter(a => vpState.addons.includes(a.name)));
+        closeVariantPicker();
+      }
+    });
+  }
+  document.getElementById('vp-title').innerHTML = dietMark(item) + escapeHtml(item.is_secret && !item.secret_visible ? maskName(item.name) : item.name);
+  renderVariantPicker();
+  document.getElementById('vp-backdrop').classList.add('show');
+}
+function renderVariantPicker() {
+  const { item, kind, size, temp } = vpState, kinds = itemKinds(item), sizes = itemSizes(item), temps = itemTemps(item);
+  // every button shows what the dish costs if THAT option is picked (with the other choices as they stand now)
+  const opt = (k, v, label, price, on) => `<button type="button" class="vp-opt" data-vp="${k}|${escapeHtml(v)}" aria-pressed="${on}">${label}<small>${inrShort(price)}</small></button>`;
+  const heroSrc = cafeInfo.show_photos ? ((kinds.find(k => k.name === kind) || {}).photo_url || (sizes.find(z => z.name === size) || {}).photo_url || item.photo_url) : null;
+  const picked = [kind, size, temp].filter(Boolean).map(x => x.charAt(0).toUpperCase() + x.slice(1));
+  // a small fixed box beside the name and price: it never stretches, so a modest photo stays sharp and nothing overlaps
+  const hero = heroSrc ? `<div class="vp-sel"><button type="button" class="vp-hero" data-pv-hero="${escapeHtml(heroSrc)}" aria-label="View photo"><img src="${escapeHtml(galThumb(heroSrc, 240))}" alt="" decoding="async"></button>
+      <div class="vp-sel-t"><b>${escapeHtml(picked.join(' · ') || galName(item))}</b><span>${inrShort(choicePrice(item, kind, size, temp))}</span></div></div>` : '';
+  document.getElementById('vp-body').innerHTML = hero +
+    (kinds.length > 1 ? `<div class="vp-sec"><div class="vp-q">Type</div><div class="vp-opts">${kinds.map(k => opt('kind', k.name, `<span class="diet-mark ${k.mark || kindMark(k.name)}"></span>${escapeHtml(k.name)}`, choicePrice(item, k.name, size, temp), k.name === kind)).join('')}</div></div>` : '') +
+    (sizes.length > 1 ? `<div class="vp-sec"><div class="vp-q">Size</div><div class="vp-opts">${sizes.map(z => opt('size', z.name, escapeHtml(z.name), choicePrice(item, kind, z.name, temp), z.name === size)).join('')}</div></div>` : '') +
+    (temps.length > 1 ? `<div class="vp-sec"><div class="vp-q">Hot or cold?</div><div class="vp-opts">${temps.map(t => opt('temp', t, t === 'hot' ? '♨ Hot' : '❄ Cold', choicePrice(item, kind, size, t), t === temp)).join('')}</div></div>` : '') +
+    (itemAddons(item).length ? `<div class="vp-sec"><div class="vp-q">Add-ons <small style="font-weight:500;opacity:.7;">(optional)</small></div><div class="vp-opts">${itemAddons(item).map(a => `<button type="button" class="vp-opt" data-vp="addon|${escapeHtml(a.name)}" aria-pressed="${vpState.addons.includes(a.name)}">${escapeHtml(a.name)}<small>+${inrShort(a.price)}</small></button>`).join('')}</div></div>` : '') +
+    `<button type="button" class="place-order-btn vp-add" id="vp-add">Add — ${inrShort(choicePrice(item, kind, size, temp) + addonSum(itemAddons(item).filter(a => vpState.addons.includes(a.name))))}</button>`;
+}
+function closeVariantPicker() { const b = document.getElementById('vp-backdrop'); if (b) b.classList.remove('show'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVariantPicker(); });
+
+/* ---- the cart, keyed by item + choice ---- */
+function cartKey(id, size, temp, kind, addons) { const base = (size || temp || kind) ? `${id}|${kind || ''}|${size || ''}|${temp || ''}` : String(id); return (addons && addons.length) ? base + '|+' + addons.map(a => a.name).sort().join('+') : base; }
+function variantLabel(kind, size, temp) { return [kind, size, temp === 'hot' ? 'Hot' : temp === 'cold' ? 'Cold' : null].filter(Boolean).join(' · '); }
+function itemQtyInCart(id) { return Object.values(cart).filter(c => c.menu_item_id === id).reduce((s, c) => s + c.quantity, 0); }
+function addVariant(item, size, temp, delta, btn, kind, addons) {
+  const kinds = itemKinds(item), sizes = itemSizes(item);
+  const kd = kind || (kinds.length === 1 ? kinds[0].name : null);
+  const sz = size || (sizes.length === 1 ? sizes[0].name : null);
+  const tp = itemTemps(item).length > 1 ? temp : null;   // only-hot / only-cold items don't need it spelled out
+  const ads = (addons || []).slice();
+  const key = cartKey(item.id, sz, tp, kd, ads);
+  const base = item.is_secret ? (item.secret_visible ? item.name : maskName(item.name)) + ' (secret)' : item.name;
+  const label = variantLabel(kd, sz, tp);
+  const full = (label ? `${base} · ${label}` : base) + (ads.length ? ' + ' + ads.map(a => a.name).join(', ') : '');
+  if (!cart[key]) cart[key] = { menu_item_id: item.id, kind: kd, size: sz, temperature: tp, addons: ads, name: full, price: choicePrice(item, kd, sz, tp) + addonSum(ads), quantity: 0 };
+  cart[key].quantity = Math.max(0, cart[key].quantity + delta);
+  if (cart[key].quantity === 0) delete cart[key];
+  if (delta > 0 && btn && window.templateHooks) window.templateHooks.onAddToCart(btn);
+  refreshItemRow(item);
+  renderCartBar(); renderOrderPanel();
+}
+function refreshItemRow(item) {
+  document.querySelectorAll('.fc-add[data-fc="' + item.id + '"]').forEach(e => { e.innerHTML = fcAddHtml(item); });
+  document.querySelectorAll('#mi-row-' + item.id + ' .qty-control').forEach(q => { q.innerHTML = qtyControlHtml(item, itemQtyInCart(item.id)); });
+}
+// Order page steppers work on one cart line (one size / temperature).
+function changeLineQty(key, delta) {
+  const c = cart[key]; if (!c) return;
+  c.quantity = Math.max(0, c.quantity + delta);
+  if (!c.quantity) delete cart[key];
+  const item = menu.find(i => i.id === c.menu_item_id); if (item) refreshItemRow(item);
+  renderCartBar(); renderOrderPanel();
+}
+</script>
+
+<style id="gallery-fx">
+  /* ---- item photo slideshow (list) + photo card (tap) ---- */
+  .mi-slide { position: relative; width: 76px; height: 76px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); flex-shrink: 0; background: var(--placeholder-bg); padding: 0; display: block; cursor: zoom-in; -webkit-tap-highlight-color: transparent; font: inherit; color: inherit; }
+  /* dishes without a photo keep the same row height as the ones with a 76px photo */
+  .menu-item:not(:has(.mi-slide)) > .mi-info { min-height: 76px; display: flex; flex-direction: column; justify-content: center; }
+  .mi-slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .7s ease; }
+  .mi-slide img.on { opacity: 1; }
+  .ms-tag { position: absolute; left: 4px; bottom: 4px; max-width: calc(100% - 8px); font-size: 9px; font-weight: 700; line-height: 1.5; padding: 0 6px; border-radius: 99px; background: rgba(20,20,20,.62); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity .35s ease; pointer-events: none; }
+  .ms-tag.on { opacity: 1; }
+  .ms-dots { position: absolute; top: 5px; left: 0; right: 0; display: flex; justify-content: center; gap: 3px; pointer-events: none; }
+  .ms-dots i { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: 0 0 2px rgba(0,0,0,.4); transition: background .3s, transform .3s; }
+  .ms-dots i.on { background: #fff; transform: scale(1.25); }
+
+  #pv { position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(15,15,15,.62); opacity: 0; transition: opacity .22s ease; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+  #pv.show { display: flex; }
+  #pv.in { opacity: 1; }
+  .pv-card { position: relative; width: min(100%, 440px); background: var(--paper, #fff); border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.35); transform: translateY(14px) scale(.96); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+  #pv.in .pv-card { transform: none; }
+  .pv-stage { position: relative; background: var(--placeholder-bg, #eee); }
+  .pv-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+  .pv-track::-webkit-scrollbar { display: none; }
+  .pv-track.single { overflow: hidden; }
+  .pv-slide { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; aspect-ratio: 1 / 1; max-height: 62vh; width: 100%; }
+  .pv-slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; -webkit-user-drag: none; }
+  .pv-x { all: unset; cursor: pointer; position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,20,.55); color: #fff; display: flex; align-items: center; justify-content: center; z-index: 2; -webkit-tap-highlight-color: transparent; }
+  .pv-x:focus, .pv-x:focus-visible { outline: none; }
+  .pv-arrow { all: unset; cursor: pointer; position: absolute; top: 50%; width: 36px; height: 36px; margin-top: -18px; border-radius: 50%; background: rgba(255,255,255,.88); color: #171A21; display: none; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,.25); transition: transform .15s; }
+  .pv-arrow:hover { transform: scale(1.08); }
+  .pv-arrow.l { left: 10px; } .pv-arrow.r { right: 10px; }
+  @media (hover: hover) and (pointer: fine) { .pv-card.multi .pv-arrow { display: flex; } }
+  .pv-dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 6px; z-index: 2; }
+  .pv-dots button { all: unset; cursor: pointer; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.6); box-shadow: 0 0 3px rgba(0,0,0,.45); transition: transform .25s, background .25s; }
+  .pv-dots button.on { background: #fff; transform: scale(1.3); }
+  .pv-cap { padding: 14px 18px 18px; }
+  .pv-cap b { display: block; font-size: 17px; line-height: 1.25; }
+  .pv-cap span { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 99px; background: var(--placeholder-bg, #eee); color: var(--text, #222); transition: opacity .25s; min-height: 20px; }
+  .pv-cap span:empty { visibility: hidden; }
+  body.pv-lock { overflow: hidden; }
+  @media (prefers-reduced-motion: reduce) { .mi-slide img, .pv-card, #pv { transition: none; } .pv-track { scroll-behavior: auto; } }
+
+  /* the photo of whatever is picked, on top of the Type / Size sheet */
+  .vp-sel { display: flex; align-items: center; gap: 14px; margin: 0 0 16px; }
+  .vp-hero { all: unset; cursor: zoom-in; position: relative; flex: 0 0 88px; width: 88px; height: 88px; border-radius: 14px; overflow: hidden; background: var(--placeholder-bg, #eee); border: 1px solid var(--border); -webkit-tap-highlight-color: transparent; }
+  .vp-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .vp-sel-t { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .vp-sel-t b { font-size: 16px; line-height: 1.25; overflow-wrap: anywhere; }
+  .vp-sel-t span { font-size: 15px; font-weight: 600; opacity: .8; }
+</style>
+<script id="gallery-js">
+/* One photo for the dish, plus one per Type / Size the cafe photographed. The list tile cycles through them
+   (only while on screen, paused while a finger or cursor is on it); tapping opens them as a card. */
+const GAL_ID = u => u;
+function galThumb(u, w) { return u && /\/media\/menu\//.test(u) ? u + (u.includes('?') ? '&' : '?') + 'w=' + w : u; }
+function itemFrames(item) {
+  const out = [], seen = new Set();
+  const add = (src, label) => { if (src && !seen.has(src)) { seen.add(src); out.push({ src, label: label || '' }); } };
+  add(item.photo_url, '');
+  itemKinds(item).forEach(k => add(k.photo_url, k.name));
+  itemSizes(item).forEach(z => add(z.photo_url, z.name));
+  return out;
+}
+const galName = item => item.is_secret && typeof maskName === 'function' ? maskName(item.name) : item.name;
+function slideTileHtml(item, frames, w) {
+  w = w || 240;
+  const multi = frames.length > 1;
+  return `<button type="button" class="mi-slide" data-slide="${item.id}" data-n="${frames.length}" aria-label="Photos of ${escapeHtml(galName(item))}">
+    ${frames.map((f, i) => `<img alt="" decoding="async" draggable="false" ${i === 0 ? `src="${escapeHtml(galThumb(f.src, w))}" class="on"` : `data-src="${escapeHtml(galThumb(f.src, w))}"`} data-label="${escapeHtml(f.label)}">`).join('')}
+    ${multi ? `<span class="ms-dots">${frames.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>` : ''}
+    <span class="ms-tag ${frames[0].label && multi ? 'on' : ''}">${escapeHtml(multi ? frames[0].label : '')}</span>
+  </button>`;
+}
+
+/* ---- list slideshow: one timer for the whole page ---- */
+const GalSlides = (() => {
+  const INTERVAL = 3200, reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const visible = new Set(), state = new WeakMap();
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { visible.add(e.target); const s = st(e.target); if (!s.at) s.at = Date.now() + 1200 + Math.random() * 1800; }
+    else visible.delete(e.target);
+  }), { rootMargin: '40px' }) : null;
+  const st = el => { let s = state.get(el); if (!s) { s = { i: 0, at: 0, hold: false }; state.set(el, s); } return s; };
+  function show(el, to) {
+    const imgs = el.querySelectorAll('img'), s = st(el);
+    const img = imgs[to]; if (!img) return;
+    const apply = () => {
+      imgs.forEach((m, k) => m.classList.toggle('on', k === to));
+      el.querySelectorAll('.ms-dots i').forEach((d, k) => d.classList.toggle('on', k === to));
+      const tag = el.querySelector('.ms-tag'); if (tag) { const lab = img.dataset.label || ''; tag.textContent = lab; tag.classList.toggle('on', !!lab); }
+      s.i = to;
+    };
+    if (!img.getAttribute('src')) { img.onerror = () => { img.remove(); }; img.onload = apply; img.src = img.dataset.src; }
+    else apply();
+  }
+  function tick() {
+    if (document.hidden || document.body.classList.contains('pv-lock') || document.querySelector('.sheet-backdrop.show')) return;
+    const now = Date.now();
+    visible.forEach(el => {
+      if (!el.isConnected) { visible.delete(el); return; }
+      const s = st(el), n = el.querySelectorAll('img').length;
+      if (n < 2 || s.hold || now < s.at) return;
+      s.at = now + INTERVAL; show(el, (s.i + 1) % n);
+    });
+  }
+  function scan(root) {
+    (root || document).querySelectorAll('.mi-slide:not([data-w])').forEach(el => {
+      el.dataset.w = '1';
+      if (io) io.observe(el);
+      if (Number(el.dataset.n) > 1 && !reduce) {
+        el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') st(el).hold = true; });
+        el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { const s = st(el); s.hold = false; s.at = Date.now() + 1500; } });
+        el.addEventListener('touchstart', () => { const s = st(el); s.hold = true; }, { passive: true });
+        const rel = () => { const s = st(el); s.hold = false; s.at = Date.now() + 2000; };
+        el.addEventListener('touchend', rel, { passive: true }); el.addEventListener('touchcancel', rel, { passive: true });
+      }
+    });
+  }
+  if (!reduce) setInterval(tick, 400);
+  setInterval(() => scan(), 700);
+  return { scan, index: el => st(el).i };
+})();
+
+/* ---- the photo card ---- */
+const PV = (() => {
+  let el, track, dots, cap, frames = [], idx = 0, timer = 0, hold = false, resumeAt = 0, itemRef = null;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function build() {
+    el = document.createElement('div'); el.id = 'pv'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+    el.innerHTML = `<div class="pv-card"><div class="pv-stage">
+        <div class="pv-track" id="pv-track"></div>
+        <button type="button" class="pv-x" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <button type="button" class="pv-arrow l" aria-label="Previous photo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button type="button" class="pv-arrow r" aria-label="Next photo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="pv-dots" id="pv-dots"></div></div>
+      <div class="pv-cap"><b id="pv-name"></b><span id="pv-lab"></span></div></div>`;
+    document.body.appendChild(el);
+    track = el.querySelector('#pv-track'); dots = el.querySelector('#pv-dots');
+    el.addEventListener('click', e => { if (e.target === el || e.target.closest('.pv-x')) close(); });
+    el.querySelector('.pv-arrow.l').addEventListener('click', () => go(idx - 1));
+    el.querySelector('.pv-arrow.r').addEventListener('click', () => go(idx + 1));
+    dots.addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (b) go(Number(b.dataset.i)); });
+    let raf = 0;
+    track.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth)); if (i !== idx) mark(i); }); }, { passive: true });
+    const pause = () => { hold = true; }, rel = () => { hold = false; resumeAt = Date.now() + 3500; };
+    el.querySelector('.pv-stage').addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pause(); });
+    el.querySelector('.pv-stage').addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') rel(); });
+    track.addEventListener('touchstart', pause, { passive: true }); track.addEventListener('touchend', rel, { passive: true }); track.addEventListener('touchcancel', rel, { passive: true });
+  }
+  function mark(i) {
+    idx = i;
+    dots.querySelectorAll('button').forEach((d, k) => d.classList.toggle('on', k === i));
+    const f = frames[i]; el.querySelector('#pv-lab').textContent = f ? f.label : '';
+    const nx = track.children[i + 1]; if (nx) { const im = nx.querySelector('img'); if (im && !im.getAttribute('src')) im.src = im.dataset.src; }
+  }
+  function go(i) {
+    const n = frames.length; if (n < 2) return;
+    i = (i + n) % n;
+    track.style.scrollBehavior = (i === 0 && idx === n - 1) || reduce ? 'auto' : 'smooth';   // wrapping round jumps back instead of racing across
+    track.scrollTo({ left: i * track.clientWidth });
+    mark(i);
+  }
+  function open(item, start, list) {
+    frames = list || itemFrames(item); if (!frames.length) return;
+    itemRef = item; if (!el) build();
+    const multi = frames.length > 1;
+    track.classList.toggle('single', !multi); el.querySelector('.pv-card').classList.toggle('multi', multi);
+    track.innerHTML = frames.map((f, i) => `<div class="pv-slide"><img alt="" decoding="async" draggable="false" ${Math.abs(i - start) <= 1 ? `src="${escapeHtml(galThumb(f.src, 720))}"` : `data-src="${escapeHtml(galThumb(f.src, 720))}"`}></div>`).join('');
+    track.querySelectorAll('img').forEach(im => { im.onerror = () => { im.style.visibility = 'hidden'; }; });
+    dots.innerHTML = multi ? frames.map((_, i) => `<button type="button" data-i="${i}" aria-label="Photo ${i + 1} of ${frames.length}"></button>`).join('') : '';
+    el.querySelector('#pv-name').textContent = galName(item);
+    el.setAttribute('aria-label', 'Photos of ' + galName(item));
+    el.classList.add('show'); document.body.classList.add('pv-lock');
+    start = Math.min(Math.max(0, start || 0), frames.length - 1);
+    track.style.scrollBehavior = 'auto'; track.scrollLeft = start * track.clientWidth; idx = start; mark(start);
+    requestAnimationFrame(() => { track.scrollLeft = start * track.clientWidth; el.classList.add('in'); });
+    clearInterval(timer); hold = false; resumeAt = Date.now() + 2500;
+    if (multi && !reduce) timer = setInterval(() => { if (!hold && Date.now() > resumeAt && !document.hidden) go(idx + 1); }, 3500);
+    el.querySelector('.pv-x').focus({ preventScroll: true });
+  }
+  function close() {
+    if (!el || !el.classList.contains('show')) return;
+    clearInterval(timer); el.classList.remove('in'); document.body.classList.remove('pv-lock');
+    setTimeout(() => { if (!el.classList.contains('in')) el.classList.remove('show'); }, 230);
+  }
+  const isOpen = () => !!el && el.classList.contains('show') && el.classList.contains('in');
+  window.addEventListener('keydown', e => {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { e.stopImmediatePropagation(); close(); }
+    else if (e.key === 'ArrowRight') go(idx + 1); else if (e.key === 'ArrowLeft') go(idx - 1);
+  }, true);
+  return { open, close };
+})();
+document.addEventListener('click', e => {
+  const t = e.target.closest('.mi-slide'); if (t) {
+    const item = (typeof menu !== 'undefined' ? menu : []).find(i => String(i.id) === t.dataset.slide); if (!item) return;
+    PV.open(item, GalSlides.index(t)); return;
+  }
+  const h = e.target.closest('[data-pv-hero]'); if (h && typeof vpState !== 'undefined' && vpState) {
+    const fr = itemFrames(vpState.item), at = Math.max(0, fr.findIndex(f => f.src === h.dataset.pvHero));
+    PV.open(vpState.item, at, fr);
+  }
+});
+</script>
+
+<script>
+const API_BASE = "https://xyzzy-backend.onrender.com";
+
+const params = new URLSearchParams(location.search);
+const qrToken = params.get('token');
+
+let cafeInfo = null, tableInfo = null, menu = [];
+let cart = {}; // cart key (item id, or id|size|temp) -> {menu_item_id, size, temperature, name, price, quantity}
+let orderHistory = []; // this table's currently-open (unbilled) orders — the running tab, separate from the draft cart
+let pendingOrders = []; // orders the customer has confirmed that are still being sent — shown at once as "Sending…"
+let retryToken = null, retrySig = ''; // if a send fails, re-confirming the SAME cart re-uses its token, so a retry can never order twice
+let searchQuery = '';
+
+/* ---- Notifications (built on events this page can genuinely observe: an
+   order placed, a waiter called. There is currently no customer-facing
+   endpoint to poll live order-status transitions (preparing/served/paid) —
+   see notifyOrderStatus() below, which is a ready-made hook for that once
+   such an endpoint or a push subscription exists, so nothing here needs to
+   change except wiring the source in. ) ---- */
+let notifications = [];
+let unreadCount = 0;
+
+function addNotification(title, message) {
+  notifications.unshift({ title, message, time: new Date(), read: false });
+  unreadCount++;
+  updateBellBadge();
+}
+// Hook for future order-status push/poll integration — intentionally unused
+// for now since no such endpoint exists yet; wire a real source in here.
+function notifyOrderStatus(status) {
+  const copy = { preparing: 'Your order is being prepared.', served: 'Your order has been served.', paid: 'Order completed — thanks for visiting!' };
+  if (copy[status]) addNotification('Order update', copy[status]);
+}
+function updateBellBadge() {
+  const badge = document.getElementById('bell-badge');
+  badge.classList.toggle('show', unreadCount > 0);
+}
+function formatNotifTime(d) {
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function renderNotifications() {
+  const wrap = document.getElementById('notif-lines');
+  if (!notifications.length) {
+    wrap.innerHTML = '<div class="sheet-empty">Nothing yet — updates about your order and waiter calls will show up here.</div>';
+    return;
+  }
+  wrap.innerHTML = '';
+  notifications.forEach(n => {
+    const row = document.createElement('div');
+    row.className = 'notif-item' + (n.read ? ' read' : '');
+    row.innerHTML = `<div class="notif-dot"></div>
+      <div><p class="notif-title">${escapeHtml(n.title)}</p><p class="notif-msg">${escapeHtml(n.message)}</p><div class="notif-time">${formatNotifTime(n.time)}</div></div>`;
+    wrap.appendChild(row);
+  });
+}
+function toggleNotifications() {
+  renderNotifications();
+  document.getElementById('notif-backdrop').classList.add('show');
+  notifications.forEach(n => n.read = true);
+  unreadCount = 0;
+  updateBellBadge();
+}
+function closeNotifications() { document.getElementById('notif-backdrop').classList.remove('show'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ---- Location: verified once (high-accuracy GPS only, no cell-tower
+// fallback — precision matters more than success rate here), then reused
+// for LOCATION_CACHE_MINUTES so repeat calls/orders from the SAME device on
+// THIS table don't re-prompt every time. Deliberately stored per-table
+// (keyed by this table's own QR token) rather than a blanket "don't check
+// this table for X minutes" — otherwise anyone who ever got hold of the
+// link (a screenshot, a forward) would skip verification too, not just the
+// person who actually verified.
+const LOCATION_TIMEOUT_MS = 10000;
+const LOCATION_CACHE_MINUTES = 10;
+const LOCATION_STATUS_MESSAGES = ['Checking your location…', 'Confirming your table…', 'Almost there…'];
+const LOCATION_CACHE_KEY = qrToken ? `xyzzy_loc_${qrToken}` : null;
+
+let locationPromise = null;     // in-flight fetch, if one's currently running
+
+function readLocationCache() {
+  if (!LOCATION_CACHE_KEY) return null;
+  try {
+    const raw = localStorage.getItem(LOCATION_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed.cachedAt > LOCATION_CACHE_MINUTES * 60 * 1000) return null; // stale
+    return parsed;
+  } catch (e) { return null; }
+}
+function writeLocationCache(result) {
+  if (!LOCATION_CACHE_KEY) return;
+  try {
+    localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify({ ...result, cachedAt: Date.now() }));
+  } catch (e) { /* localStorage unavailable (private mode etc.) — just skip caching, not fatal */ }
+}
+
+function fetchLocationOnce() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: LOCATION_TIMEOUT_MS, maximumAge: 0 }
+    );
+  });
+}
+
+function cacheIsFresh() {
+  return !!readLocationCache();
+}
+
+// What callers actually use — reuses a fresh cached verification instantly
+// (no GPS call at all) if this same device verified for this same table
+// within the last LOCATION_CACHE_MINUTES. Otherwise does one fresh check,
+// capped at LOCATION_TIMEOUT_MS — if that fails or times out, the call/order
+// still goes through, just unverified (the backend's spam guard is what
+// actually catches a pattern of repeated unverified attempts, not this).
+// A failed check is never cached, so the next tap tries again fresh rather
+// than being stuck "unverified" for the full window over a one-off hiccup.
+function getLocation() {
+  const cached = readLocationCache();
+  if (cached) return Promise.resolve(cached);
+  if (locationPromise) return locationPromise; // a check is already in flight — share it, don't start a second one
+
+  locationPromise = (async () => {
+    const result = await fetchLocationOnce();
+    locationPromise = null;
+    if (result) { writeLocationCache(result); return result; }
+    return { lat: null, lng: null, accuracy: null }; // consistent shape either way
+  })();
+  return locationPromise;
+}
+
+// Shows a cycling status message on a button ONLY while a real GPS check is
+// actually in flight — if a fresh cached location is already sitting ready
+// (the common case for repeat taps within the cache window), this does
+// nothing and the tap is instant.
+async function withLocationStatus(button, fn) {
+  let interval = null;
+  if (!cacheIsFresh()) {
+    let i = 0;
+    button.textContent = LOCATION_STATUS_MESSAGES[0];
+    interval = setInterval(() => {
+      i = (i + 1) % LOCATION_STATUS_MESSAGES.length;
+      button.textContent = LOCATION_STATUS_MESSAGES[i];
+    }, 900);
+  }
+  try {
+    return await fn();
+  } finally {
+    if (interval) clearInterval(interval);
+  }
+}
+
+// ---- Menu templates ----
+// window.templateHooks lets a template's JS react to things happening in
+// the shared engine (e.g. "an item was just added to the cart") without the
+// engine needing to know anything about any specific template. Every hook
+// defaults to a no-op, so a template that doesn't define one just does
+// nothing extra — never an error.
+window.templateHooks = {
+  onAddToCart(buttonEl) {},
+};
+
+function applyTemplate(templateId) {
+  // Only plain ids ever reach a file path (templates/<id>.css|js).
+  const id = /^[a-z0-9_-]{1,30}$/.test(templateId || '') ? templateId : 'default';
+  const link = document.getElementById('template-skin-css');
+  window.templateHooks = { onAddToCart(buttonEl) {} }; // reset to no-ops before loading the new one in
+  if (window.ThemeFX) ThemeFX.stop();                  // a previous theme's animated background, if any
+  document.documentElement.dataset.theme = id;
+  const existing = document.getElementById('template-js');
+  if (existing) existing.remove();
+  if (id === 'default') { link.href = ''; return Promise.resolve(); }   // default.css alone is the whole look
+
+  // Resolves once the skin (and the fonts it @imports) has loaded — so the cover never flashes the wrong look.
+  const skinLoaded = new Promise(resolve => { link.onload = link.onerror = () => resolve(); setTimeout(resolve, 2500); });
+  link.href = `templates/${id}.css`;
+  const script = document.createElement('script');
+  script.id = 'template-js';
+  script.src = `templates/${id}.js`;
+  document.body.appendChild(script);
+  return skinLoaded;
+}
+
+/* Owner-only preview: order.html?token=…&theme=royal&preview=1 shows a theme without saving it. */
+const PREVIEW_THEME = (params.get('preview') === '1' && /^[a-z0-9_-]{1,30}$/.test(params.get('theme') || '')) ? params.get('theme') : '';
+function showPreviewBadge() {
+  if (!PREVIEW_THEME) return;
+  const b = document.createElement('div');
+  b.textContent = '👁 Previewing the “' + PREVIEW_THEME + '” theme — not saved (tap to hide)';
+  b.style.cssText = 'position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99999;background:rgba(20,20,24,.86);color:#fff;font:600 11.5px/1.3 system-ui,sans-serif;padding:8px 14px;border-radius:99px;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer';
+  b.onclick = () => b.remove();
+  document.body.appendChild(b);
+}
+
+/* ==== Cover card + flip-in reveal ====
+   Populates the title card with THIS cafe's name (and hours/address if the
+   cafe has set them), shows it, holds for ~1.4s, then flips the whole stage
+   to land on the menu (which was rendered underneath while the cover was
+   showing, so there's no pop-in once flipped). */
+const COVER_HOLD_MS = 650;
+
+function showCoverThenFlip() {
+  document.getElementById('cover-cafe-name').textContent = cafeInfo.name || 'Menu';
+  document.getElementById('cover-hours').textContent = cafeInfo.hours_text || '';
+  document.getElementById('cover-address').textContent = cafeInfo.address_text || cafeInfo.address || '';
+
+  document.getElementById('pre-loading').style.display = 'none';
+  const stage = document.getElementById('flip-stage');
+  stage.style.display = 'block';
+
+  // Carousel math needs real dimensions, which only exist once the stage is visible.
+  updateTrackPosition(0, false);
+
+  // Force layout so the theme's fonts start loading, then reveal once they're in (max 1s).
+  void stage.offsetHeight;
+  const fontsReady = (document.fonts && document.fonts.ready)
+    ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1000))]) : Promise.resolve();
+  fontsReady.then(() => {
+    requestAnimationFrame(() => document.getElementById('cover-face').classList.add('show'));
+    setTimeout(() => {
+      const flipper = document.getElementById('flipper');
+      flipper.classList.add('flipped');
+      setTimeout(() => flipper.classList.add('settled'), 700);   // flip is .55s — see .flipper.settled in default.css
+    }, COVER_HOLD_MS);
+  });
+}
+
+async function loadMenu() {
+  if (!qrToken) {
+    document.getElementById('pre-loading').style.display = 'none';
+    document.getElementById('error-state').style.display = 'block';
+    document.getElementById('error-state').textContent = 'No table code found — please rescan the QR on your table.';
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/order/${qrToken}`);
+    if (!res.ok) throw new Error((await res.json()).detail || 'Table not found');
+    const data = await res.json();
+    cafeInfo = data.cafe; tableInfo = data.table; menu = data.menu; bestsellerData = data.bestsellers || (data.cafe && data.cafe.bestsellers) || null;
+    // Hotels can keep two menus: items marked "dine" are for the restaurant tables only, "room" only for hotel guests ordering from their room QR.
+    { const inRoom = !!(tableInfo && tableInfo.is_room); menu = (menu || []).filter(i => !i.menu_for || i.menu_for === 'all' || i.menu_for === (inRoom ? 'room' : 'dine')); }
+
+    document.getElementById('cafe-name').textContent = cafeInfo.name;
+    document.getElementById('table-chip').textContent = tableInfo.label || (tableInfo.name || (/^\d+[A-Za-z]?$/.test(String(tableInfo.table_number).trim()) ? 'Table ' + String(tableInfo.table_number).trim() : String(tableInfo.table_number).trim()));
+    if (cafeInfo.logo_url) {
+      const logoEl = document.getElementById('cafe-logo');
+      logoEl.src = cafeInfo.logo_url;
+      logoEl.style.display = 'block';
+      document.getElementById('cafe-logo-fallback').style.display = 'none';
+    }
+    await applyTemplate(PREVIEW_THEME || cafeInfo.menu_template);
+    if (!cafeInfo.theme_effects_enabled) {
+      if (window.ThemeFX) ThemeFX.stop();          // stop the ambient background
+      window.templateHooks = { onAddToCart() {} };  // no burst on add-to-cart
+    }
+    showPreviewBadge();
+    applyRoomMode();
+    renderMenu();
+    renderOrderPanel();
+    renderAboutPanel();
+
+    const aboutDot = document.querySelector('#panel-nav-dots span[aria-label="About"]');
+    if (aboutDot) aboutDot.style.display = cafeInfo.about_enabled ? '' : 'none';
+
+    showCoverThenFlip();
+    if (location.hash === '#about' && cafeInfo.about_enabled) { currentPanel = 2; updateTrackPosition(0, false); updateDots(); renderAboutPanel(); }
+
+    fetchOrderHistory();
+    setInterval(fetchOrderHistory, 4000);
+  } catch (e) {
+    document.getElementById('pre-loading').style.display = 'none';
+    document.getElementById('error-state').style.display = 'block';
+    document.getElementById('error-state').textContent = e.message;
+  }
+}
+
+/* ---- Search ---- */
+function onSearchInput() {
+  searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+  document.getElementById('search-clear').classList.toggle('show', searchQuery.length > 0);
+  renderMenu();
+}
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  searchQuery = '';
+  document.getElementById('search-clear').classList.remove('show');
+  renderMenu();
+}
+function matchesSearch(item) {
+  if (item.is_secret) return false;          // secret items live only on the hidden menu
+  if (typeof matchesFilters === 'function' && !matchesFilters(item)) return false;
+  if (!searchQuery) return true;
+  const haystack = [item.name, item.description, item.category, item.section, itemContains(item).join(' '), itemTemps(item).join(' '), itemKinds(item).map(k => k.name).join(' '), item.diet === 'egg' ? 'egg' : '', item.diet === 'veg' ? 'veg' : item.diet ? 'non-veg nonveg' : ''].filter(Boolean).join(' ').toLowerCase();
+  return haystack.includes(searchQuery);
+}
+
+/* ---- Category icon (presentational heuristic only — never affects data) ---- */
+function categoryIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (/(coffee|tea|beverage|drink|juice|shake)/.test(n)) {
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>';
+  }
+  if (/(dessert|cake|sweet|pastry)/.test(n)) {
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2 1 3.5 1 2-1 3.5-1 2 1 3.5 1 2-1 2-1"/><path d="M2 21h20"/><path d="M7 8v3M12 8v3M17 8v3"/></svg>';
+  }
+  if (/(main|curry|rice|pizza|burger|noodle|pasta)/.test(n)) {
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a2 2 0 0 0 4 0V2"/><path d="M5 12v10"/><path d="M19 2v20"/><path d="M15 2v6a2 2 0 0 0 4 0V2"/></svg>';
+  }
+  return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>';
+}
+
+function qtyControlHtml(item, qty) {
+  return `
+    ${qty > 0 ? `<button class="qty-btn" onclick="changeQty(${item.id}, -1)" aria-label="Decrease"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span class="qty-num" id="qty-${item.id}">${qty}</span>` : ''}
+    <button class="qty-btn primary" onclick="changeQty(${item.id}, 1, event)" aria-label="Add"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>`;
+}
+function renderMenuItemRow(item) {
+  const qty = itemQtyInCart(item.id);
+  const row = document.createElement('div');
+  row.id = 'mi-row-' + item.id;
+  row.className = 'menu-item' + (item.is_priority ? ' priority' : '');
+
+  const frames = !cafeInfo.show_photos ? [] : itemFrames(item);     // the dish's photo + one per Type / Size that has its own
+  const photoHtml = !cafeInfo.show_photos ? '' : (frames.length ? slideTileHtml(item, frames) : '');   // no photo → no photo card at all
+
+  row.innerHTML = `
+    ${photoHtml}
+    <div class="mi-info">
+      ${item.is_priority ? `<div class="priority-badge">Today's pick</div>` : ''}
+      <div class="mi-top-row">
+        <p class="mi-name">${dietMark(item)}${escapeHtml(item.name)}${item.unit ? ` <span class="mi-unit">(${escapeHtml(item.unit)})</span>` : ''}</p>
+        <span class="mi-price">${priceLabel(item)}</span>
+      </div>
+      ${item.description ? `<p class="mi-desc">${escapeHtml(item.description)}</p>` : ''}
+      ${itemTagsHtml(item)}
+    </div>
+    <div class="qty-control">${qtyControlHtml(item, qty)}</div>`;
+  return row;
+}
+const PLACEHOLDER_TILE = '<div class="mi-photo-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg></div>';
+
+/* ==== Specials + Bestsellers carousels ====
+   Specials  = the items the cafe marked "Today's pick" in the dashboard.
+   Bestsellers = what actually sells. The numbers come from the same order history as the
+   dashboard's Analytics, supplied by the backend on the menu response as either
+     data.bestsellers = [{ menu_item_id, qty }, …]   (qty sold, e.g. over the last 30 days)
+   or a sold_count on each menu item. With too little history there is NO Bestsellers row —
+   it only appears once at least BEST_MIN_ITEMS different dishes have each sold BEST_MIN_SOLD times. */
+const BEST_MIN_SOLD = 3, BEST_MIN_ITEMS = 3, BEST_MAX = 10;
+let bestsellerData = null;
+function bestsellerItems(pool) {
+  const qty = {};
+  if (Array.isArray(bestsellerData)) bestsellerData.forEach(b => { const id = b.menu_item_id != null ? b.menu_item_id : b.id; if (id != null) qty[id] = Number(b.qty != null ? b.qty : (b.count != null ? b.count : b.sold)) || 0; });
+  menu.forEach(i => { const c = Number(i.sold_count != null ? i.sold_count : i.order_count); if (c) qty[i.id] = Math.max(qty[i.id] || 0, c); });
+  const ranked = pool.filter(i => i.is_available !== false && !i.is_secret && (qty[i.id] || 0) >= BEST_MIN_SOLD)
+    .sort((a, b) => qty[b.id] - qty[a.id]);
+  if (ranked.length < BEST_MIN_ITEMS) return [];
+  // Dishes the owner took off the Bestsellers row (dashboard → Menu). Counted before removing, so taking one off never makes the whole row vanish.
+  const hid = new Set(((cafeInfo && cafeInfo.bestseller_hidden) || []).map(Number));
+  return ranked.slice(0, BEST_MAX).filter(i => !hid.has(Number(i.id)));
+}
+function fcAddHtml(item) {
+  const q = itemQtyInCart(item.id);
+  return q > 0
+    ? `<button onclick="changeQty(${item.id}, -1)" aria-label="Remove one">−</button><span class="q">${q}</span><button onclick="changeQty(${item.id}, 1, event)" aria-label="Add one">+</button>`
+    : `<span onclick="changeQty(${item.id}, 1, event)" style="padding:0 14px;height:100%;display:flex;align-items:center;">ADD</span>`;
+}
+function featuredCarousel(title, items, id) {
+  const box = document.createElement('div');
+  box.className = 'fc-wrap'; box.id = id;
+  box.innerHTML = `<div class="fc-head"><h2>${escapeHtml(title)}</h2><span class="fc-count">${items.length}</span></div>
+    <div class="fc-track">${items.map(i => {
+      const ps = priceChoices(i), lo = Math.min(...ps), hi = Math.max(...ps);
+      const frames = itemFrames(i);                       // the dish's photo plus one per Type / Size — the whole slideshow, like the menu list
+      const add = `<div class="fc-add" data-fc="${i.id}" onclick="event.stopPropagation()"></div>`;
+      return `<div class="fc-card${frames.length ? '' : ' fc-noimg'}">
+        ${frames.length ? `<div class="fc-media"><div class="fc-img">${slideTileHtml(i, frames, 420)}</div>${add}</div>` : ''}
+        <div class="fc-body"><p class="fc-name">${dietMark(i)} ${escapeHtml(i.name)}</p>
+          <div class="fc-price">${lo !== hi ? 'from ' : ''}<b>${inrShort(lo)}</b></div>${frames.length ? '' : add}</div></div>`;
+    }).join('')}</div>
+    <button type="button" class="fc-nav l" aria-label="Scroll left" hidden>‹</button><button type="button" class="fc-nav r" aria-label="Scroll right" hidden>›</button>`;
+  const trk = box.querySelector('.fc-track'), bl = box.querySelector('.fc-nav.l'), br = box.querySelector('.fc-nav.r');
+  const navSync = () => { bl.hidden = trk.scrollLeft < 8; br.hidden = trk.scrollLeft + trk.clientWidth >= trk.scrollWidth - 8; };
+  trk.addEventListener('scroll', navSync, { passive: true });
+  bl.onclick = () => trk.scrollBy({ left: -trk.clientWidth * 0.8, behavior: 'smooth' });
+  br.onclick = () => trk.scrollBy({ left: trk.clientWidth * 0.8, behavior: 'smooth' });
+  setTimeout(navSync, 300); window.addEventListener('resize', navSync);
+  box.querySelectorAll('.fc-add').forEach(el => { el.innerHTML = fcAddHtml(menu.find(m => m.id === Number(el.dataset.fc))); });
+  return box;
+}
+
+function categorySlug(cat) { return 'cat-block-' + cat.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase(); }
+
+function orderedCategoryNames(byCategory) {
+  let names = Object.keys(byCategory);
+  if (cafeInfo.category_order && cafeInfo.category_order.length) {
+    const ordered = cafeInfo.category_order.filter(c => byCategory[c]);
+    const remaining = names.filter(c => !ordered.includes(c));
+    names = [...ordered, ...remaining];
+  }
+  return names;
+}
+
+/* ---- "Your usual": the dishes this phone orders most at this cafe (kept in this browser only) ---- */
+const usualKey = () => 'xyzzy-usual-' + (cafeInfo && cafeInfo.id != null ? cafeInfo.id : 'x');
+function rememberUsual(apiItems) {
+  let u = {}; try { u = JSON.parse(localStorage.getItem(usualKey()) || '{}') || {}; } catch (e) { u = {}; }
+  (apiItems || []).forEach(i => { const k = String(i.menu_item_id); const o = u[k] || { n: 0, t: 0 }; o.n += 1; o.t = Date.now(); u[k] = o; });
+  const keep = Object.keys(u).sort((a, b) => u[b].t - u[a].t).slice(0, 30), out = {}; keep.forEach(k => { out[k] = u[k]; });
+  try { localStorage.setItem(usualKey(), JSON.stringify(out)); } catch (e) { /* private mode */ }
+}
+function usualFor(visible) {
+  let u = {}; try { u = JSON.parse(localStorage.getItem(usualKey()) || '{}') || {}; } catch (e) { return []; }
+  return visible.filter(i => u[String(i.id)] && i.is_available !== false && !i.is_secret)
+    .sort((a, b) => (u[String(b.id)].n - u[String(a.id)].n) || (u[String(b.id)].t - u[String(a.id)].t)).slice(0, 6);
+}
+
+function renderMenu() {
+  const wrap = document.getElementById('menu-wrap');
+  if (!menu.length) { wrap.innerHTML = '<div class="empty-note">Menu isn\'t set up yet — ask a staff member.</div>'; return; }
+
+  if (typeof renderMenuFilters === 'function' && !document.getElementById('menu-filters')) renderMenuFilters();
+  const visible = menu.filter(matchesSearch);
+  if (!visible.length) {
+    wrap.innerHTML = `<div class="no-results">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <div>${searchQuery ? `No items match "${escapeHtml(searchQuery)}"` : 'Nothing matches these filters'}</div>
+    </div>`;
+    renderCategoryBar([]);
+    return;
+  }
+  wrap.innerHTML = '';
+
+  // Today's specials (the items marked "Today's pick") and, right below, the bestsellers — both as carousels at the top.
+  // "Your usual": what this phone ordered here before (remembered on the phone only — no login, nothing sent anywhere).
+  const usualItems = searchQuery ? [] : usualFor(visible);
+  if (usualItems.length) wrap.appendChild(featuredCarousel('Your usual', usualItems, 'cat-block-usual'));
+  const priorityItems = visible.filter(i => i.is_priority && !i.is_secret);
+  if (priorityItems.length) wrap.appendChild(featuredCarousel("Today's Specials", priorityItems, 'cat-block-priority'));
+  const bestItems = searchQuery ? [] : bestsellerItems(visible);
+  if (bestItems.length) wrap.appendChild(featuredCarousel('Bestsellers', bestItems, 'cat-block-bestsellers'));
+
+  // The rest: grouped by CATEGORY (item.section — big centred heading) and, inside it, by
+  // subcategory (item.category — the usual heading), in the owner's chosen order. Either can be
+  // left empty: no category → no big heading; no subcategory → items sit there with no heading
+  // (never "Uncategorized").
+  const subOf = i => (i.category && i.category !== 'Uncategorized') ? i.category : '';
+  const bySub = {};
+  visible.forEach(item => { const c = subOf(item) || '\u0000'; (bySub[c] = bySub[c] || []).push(item); });
+  const subOrder = orderedCategoryNames(bySub);
+  if (subOrder.includes('\u0000')) subOrder.splice(subOrder.indexOf('\u0000'), 1), subOrder.unshift('\u0000');
+  const sectionOrder = [];
+  if (Array.isArray(cafeInfo.section_order)) cafeInfo.section_order.forEach(sname => { if (visible.some(i => (i.section || '') === sname)) sectionOrder.push(sname); });
+  subOrder.forEach(c => bySub[c].forEach(i => { const k = i.section || ''; if (!sectionOrder.includes(k)) sectionOrder.push(k); }));
+  if (sectionOrder.includes('')) sectionOrder.splice(sectionOrder.indexOf(''), 1), sectionOrder.unshift('');
+  const chips = [];
+  const subBlock = (sec, c, items) => {
+    const block = document.createElement('div');
+    const named = c !== '\u0000';
+    block.className = 'category-block' + (named ? '' : ' untitled');
+    block.id = categorySlug((sec ? sec + ' ' : '') + (named ? c : 'items'));
+    block.innerHTML = named ? `<div class="category-head"><span class="category-icon">${categoryIcon(c)}</span><h2 class="category-title">${escapeHtml(c)}</h2></div><div class="category-rule"></div>` : '';
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'category-items';
+    items.forEach(item => itemsWrap.appendChild(renderMenuItemRow(item)));
+    block.appendChild(itemsWrap);
+    return block;
+  };
+  sectionOrder.forEach(sec => {
+    const host = sec ? document.createElement('section') : wrap;
+    if (sec) {
+      host.className = 'menu-section';
+      host.id = 'sec-' + categorySlug(sec);
+      host.innerHTML = `<h2 class="menu-section-title"><span>${escapeHtml(sec)}</span></h2>`;
+      chips.push({ name: sec, slug: host.id });
+    }
+    subOrder.forEach(c => {
+      const items = bySub[c].filter(i => (i.section || '') === sec);
+      if (!items.length) return;
+      const block = subBlock(sec, c, items);
+      if (!sec && c !== '\u0000') chips.push({ name: c, slug: block.id });
+      host.appendChild(block);
+    });
+    if (sec) wrap.appendChild(host);
+  });
+  // Nothing grouped at all (no categories or subcategories anywhere)? Then no chip bar either.
+  const anySection = sectionOrder.some(Boolean);
+  const named = anySection ? chips : subOrder.filter(c => c !== '\u0000').map(c => ({ name: c, slug: categorySlug(c) }));
+  renderCategoryBar((priorityItems.length ? [{ name: "Today's Specials", slug: 'cat-block-priority' }] : []).concat(bestItems.length ? [{ name: 'Bestsellers', slug: 'cat-block-bestsellers' }] : []).concat(named));
+}
+
+let categoryObserver = null;
+
+function positionStickyBars() {
+  // The chip bar stacks directly under the search bar — measured at
+  // runtime rather than hardcoded, since the search bar's real height
+  // shifts slightly with font rendering / whether the clear button shows.
+  const searchWrap = document.querySelector('.search-wrap');
+  const bar = document.getElementById('category-scrollbar');
+  if (searchWrap && bar) bar.style.top = searchWrap.offsetHeight + 'px';
+}
+
+function renderCategoryBar(names) {
+  const bar = document.getElementById('category-scrollbar');
+  if (categoryObserver) { categoryObserver.disconnect(); categoryObserver = null; }
+
+  // Redundant once a search has already narrowed things down to a
+  // handful of results — the bar would mostly be jumping to sections
+  // that aren't even showing.
+  if (!names.length || searchQuery) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+
+  bar.style.display = 'flex';
+  const entry = n => typeof n === 'string' ? { name: n, slug: n === "Today's Picks" ? 'cat-block-priority' : categorySlug(n) } : n;
+  bar.innerHTML = names.map(n => { const { name, slug } = entry(n);
+    return `<button class="category-chip" data-target="${slug}" onclick="jumpToCategory('${slug}')">${escapeHtml(name)}</button>`;
+  }).join('');
+
+  positionStickyBars();
+
+  // Scroll-spy: whichever section is currently occupying the band just
+  // below the sticky bars gets its chip lifted, iOS-segmented-control style.
+  const bar2 = document.getElementById('category-scrollbar');
+  const topOffset = (document.querySelector('.search-wrap')?.offsetHeight || 0) + (bar2?.offsetHeight || 0);
+  categoryObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const chip = bar.querySelector(`[data-target="${entry.target.id}"]`);
+      if (!chip) return;
+      bar.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    });
+  }, { rootMargin: `-${topOffset + 4}px 0px -70% 0px`, threshold: 0 });
+
+  names.forEach(n => {
+    const { slug } = entry(n);
+    const el = document.getElementById(slug);
+    if (el) categoryObserver.observe(el);
+  });
+}
+
+function jumpToCategory(slug) {
+  const el = document.getElementById(slug);
+  if (!el) return;
+  const topOffset = (document.querySelector('.search-wrap')?.offsetHeight || 0) + (document.getElementById('category-scrollbar')?.offsetHeight || 0);
+  const y = el.getBoundingClientRect().top + window.scrollY - topOffset - 8;
+  window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+window.addEventListener('resize', positionStickyBars);
+
+function changeQty(itemId, delta, event) {
+  if (typeof itemId === 'string' && isNaN(Number(itemId))) return changeLineQty(itemId, delta);   // an order-page line
+  itemId = Number(itemId);
+  const item = menu.find(i => i.id === itemId);
+  if (!item) return;
+  if (delta > 0) {
+    if (hasChoice(item)) return openVariantPicker(item, event && event.currentTarget);
+    return addVariant(item, null, null, 1, event && event.currentTarget);
+  }
+  // − on a menu row: take one off the most recently added line for this item
+  const keys = Object.keys(cart).filter(k => cart[k].menu_item_id === itemId);
+  if (keys.length) changeLineQty(keys[keys.length - 1], -1);
+}
+
+function cartTotals() {
+  let count = 0, total = 0;
+  Object.values(cart).forEach(c => { count += c.quantity; total += c.quantity * c.price; });
+  return { count, total };
+}
+function renderCartBar() {
+  const { count, total } = cartTotals();
+  const badge = document.getElementById('cart-badge');
+  if (count === 0) { badge.style.display = 'none'; return; }
+  badge.style.display = 'inline-block';
+  badge.textContent = count + ' · ₹' + total;
+}
+
+/* ==== Order panel (swipe RIGHT from the menu) ====
+   Shows the same cart lines the old bottom sheet used to, plus the total
+   and — if this cafe has uploaded one — their payment QR code, so a
+   customer can pay right after confirming. cafeInfo.payment_qr_url doesn't
+   exist in the current backend/dashboard yet; add that field the same way
+   dashboard.html already handles the subscription payment QR, and this
+   picks it up automatically. Until then this block just stays hidden. */
+// An ordered line's name, with its add-ons ("Cold Coffee + Extra shot") unless the server already put them in the name.
+function lineName(i) { const ad = addonNamesOf(i), n = String(i.name || ''), t = ad.length ? ' + ' + ad.join(', ') : ''; return t && n.indexOf(t) === -1 ? n + t : n; }
+function renderOrderPanel() {
+  const historyWrap = document.getElementById('order-history-wrap');
+  const historyLines = document.getElementById('order-history-lines');
+  const historyAll = orderHistory.concat(pendingOrders);
+  if (!historyAll.length) {
+    historyWrap.style.display = 'none';
+    historyLines.innerHTML = '';
+  } else {
+    historyWrap.style.display = 'block';
+    historyLines.innerHTML = '';
+    let historyTotal = 0;
+    historyAll.forEach(o => {
+      historyTotal += o.total_amount;
+      const block = document.createElement('div');
+      block.style.cssText = 'margin-bottom:12px;';
+      const itemsHtml = (o.items || []).map(i =>
+        `<div style="display:flex; justify-content:space-between; font-size:13px; padding:2px 0;"><span>${escapeHtml(lineName(i))} × ${i.quantity}</span><span style="color:var(--text-secondary);">₹${i.price_at_order * i.quantity}</span></div>`
+      ).join('');
+      const num = o._sending ? null : (o.order_number != null ? o.order_number : o.id);
+      block.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; gap:8px;">
+          <span style="display:flex; align-items:center; gap:8px;"><b style="font-size:14px; color:var(--ink); font-variant-numeric:tabular-nums;">${num != null ? 'Order #' + escapeHtml(String(num)) : 'New order'}</b>
+          <span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:12px; ${o._sending ? 'background:var(--border); color:var(--text-secondary);' : 'background:var(--olive-soft); color:var(--olive-dark);'} text-transform:capitalize;">${o._sending ? 'Sending…' : escapeHtml(o.status === 'paid' ? 'completed' : o.status)}</span></span>
+          <span style="font-size:11px; color:var(--text-secondary);">${new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        ${itemsHtml}`;
+      historyLines.appendChild(block);
+    });
+    document.getElementById('order-history-total-amt').textContent = '₹' + historyTotal;
+    renderBillAsk(historyAll);
+  }
+
+  const linesWrap = document.getElementById('order-page-lines');
+  const entries = Object.entries(cart);
+  if (!entries.length) {
+    linesWrap.innerHTML = '<div class="order-empty">Your cart is empty — add something from the menu to get started.</div>';
+  } else {
+    linesWrap.innerHTML = '';
+    entries.forEach(([id, c]) => {
+      const row = document.createElement('div');
+      row.className = 'cart-line';
+      row.innerHTML = `
+        <div class="cart-line-info">
+          <p class="cart-line-name">${escapeHtml(c.name)}</p>
+          <span class="cart-line-price">₹${c.price} each</span>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeLineQty('${escapeHtml(id)}', -1)" aria-label="Decrease"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+          <span class="qty-num">${c.quantity}</span>
+          <button class="qty-btn primary" onclick="changeLineQty('${escapeHtml(id)}', 1)" aria-label="Add"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <span class="cart-line-total">₹${c.price * c.quantity}</span>`;
+      linesWrap.appendChild(row);
+    });
+  }
+  document.getElementById('order-page-total-amt').textContent = '₹' + cartTotals().total;
+
+  const qrWrap = document.getElementById('order-qr-wrap');
+  if (cafeInfo && cafeInfo.payment_qr_url) {
+    document.getElementById('order-qr-img').src = cafeInfo.payment_qr_url;
+    qrWrap.style.display = 'block';
+  } else {
+    qrWrap.style.display = 'none';
+  }
+}
+
+/* ==== About panel (swipe LEFT from the menu) ====
+   The cafe designs this page in the dashboard's About page studio; it arrives
+   as cafeInfo.about_layout and is drawn by about-page.js (the same engine the
+   studio's live preview uses). Cafes that haven't used the studio yet fall
+   back to their old about_text + about_photos, laid out the same way. */
+let aboutHtmlCache = '';
+let aboutSettleTimer = null;
+function renderAboutPanel() {
+  const panel = document.getElementById('panel-about');
+  const wrap = document.getElementById('panel-about-body');
+  const layout = window.AboutPage ? AboutPage.resolve(cafeInfo) : null;
+
+  if (layout) {
+    panel.classList.add('ab-panel');
+    panel.style.background = layout.style.bg;
+    AboutPage.loadFonts(layout.style);
+    const html = AboutPage.render(layout, cafeInfo, { preview: false });
+    // Re-drawing on every swipe replays the entrance animation, but it would also wipe a half-filled
+    // booking form — so if the page is unchanged and has a form, leave it exactly as the visitor left it.
+    if (html === aboutHtmlCache && wrap.querySelector('.ab-book-form')) return;
+    aboutHtmlCache = html;
+    wrap.innerHTML = html;
+
+    // Once the staggered entrance animation has genuinely finished, lock
+    // every block into a plain static state (see .ab-settled in
+    // about-page.css) — iOS Safari can otherwise re-rasterize a still-
+    // "holding" transform/opacity animation mid-scroll and visibly replay
+    // it, which is what was causing the flicker.
+    clearTimeout(aboutSettleTimer);
+    const blockCount = wrap.querySelectorAll('.ab-b').length;
+    const settleDelay = blockCount * 70 + 700; // matches the CSS stagger (70ms/block) + animation duration, plus buffer
+    aboutSettleTimer = setTimeout(() => {
+      const abEl = wrap.querySelector('.ab');
+      if (abEl) abEl.classList.add('ab-settled');
+    }, settleDelay);
+    return;
+  }
+
+  // Nothing designed and no legacy text/photos: the original friendly empty state.
+  panel.classList.remove('ab-panel');
+  panel.style.background = '';
+  document.getElementById('about-cafe-name').textContent = cafeInfo.name || '';
+  const contactLines = [];
+  if (cafeInfo.address_text || cafeInfo.address) contactLines.push(escapeHtml(cafeInfo.address_text || cafeInfo.address));
+  if (cafeInfo.phone) contactLines.push(escapeHtml(cafeInfo.phone));
+  wrap.innerHTML = contactLines.length
+    ? `<div class="about-block"><div class="about-label">Visit us</div><div class="about-text">${contactLines.join('<br>')}</div></div>`
+    : '<div class="about-empty">This cafe hasn\'t added an About section yet.</div>';
+}
+
+/* ==== Swipeable carousel: Order ← Menu → About ====
+   Panel 0 = Order, 1 = Menu (default/center), 2 = About. Swiping RIGHT
+   (finger moves left→right) reveals the panel to the left (Order); swiping
+   LEFT reveals the panel to the right (About) — same convention as any
+   standard horizontal pager. */
+let currentPanel = 1;
+let dragStartX = 0, dragStartY = 0, dragDeltaX = 0, dragging = false;
+let swipeAxis = null; // 'x' | 'y' | null — decided a few pixels into the gesture, not on the first touch event
+const panelScrollY = {}; // each panel's own vertical scroll position, remembered across swipes
+
+function maxPanel() {
+  // No About panel at all when the cafe hasn't turned it on — swiping and
+  // the nav dot both stop at Menu instead of revealing an empty page.
+  return (cafeInfo && cafeInfo.about_enabled) ? 2 : 1;
+}
+
+function updateTrackPosition(extraPx, animate) {
+  const carousel = document.getElementById('carousel');
+  const track = document.getElementById('carousel-track');
+  const w = carousel.clientWidth;
+  track.classList.toggle('dragging', !animate);
+  track.style.transform = `translateX(${-currentPanel * w + extraPx}px)`;
+}
+
+function updateDots() {
+  document.querySelectorAll('#panel-nav-dots span').forEach((d, idx) => d.classList.toggle('active', idx === currentPanel));
+}
+
+function goToPanel(i) {
+  panelScrollY[currentPanel] = window.scrollY; // remember where we're leaving this panel scrolled to
+  currentPanel = Math.max(0, Math.min(maxPanel(), i));
+  updateTrackPosition(0, true);
+  updateDots();
+  if (currentPanel === 0) renderOrderPanel();
+  if (currentPanel === 2) renderAboutPanel();
+  // Restore scroll only after the panel's own content is rebuilt above —
+  // scrolling first can clamp to a shorter page (e.g. an empty cart) before
+  // the real content fills in, and nothing scrolls further to catch up.
+  window.scrollTo(0, panelScrollY[currentPanel] || 0);
+}
+
+function initCarouselSwipe() {
+  const carousel = document.getElementById('carousel');
+  const EDGE_MARGIN = 24; // px from either screen edge — leave this zone to the OS's own back-swipe gesture
+
+  carousel.addEventListener('touchstart', e => {
+    // A swipe that starts on a photo strip or the Specials/Bestsellers row scrolls the strip instead of flipping panels.
+    if (e.target.closest && e.target.closest('.ab-gl-strip, .fc-track')) { dragging = false; return; }
+    const x = e.touches[0].clientX;
+    if (x < EDGE_MARGIN || x > window.innerWidth - EDGE_MARGIN) { dragging = false; return; }
+    dragging = true;
+    swipeAxis = null;
+    dragStartX = x;
+    dragStartY = e.touches[0].clientY;
+  }, { passive: true });
+  carousel.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const dx = e.touches[0].clientX - dragStartX;
+    const dy = e.touches[0].clientY - dragStartY;
+
+    if (swipeAxis === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      // Decide once, early, which direction this touch actually is — this
+      // is what stops a plain vertical scroll from also nudging the
+      // carousel sideways before it's clear what the person meant.
+      swipeAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (swipeAxis === 'y') { dragging = false; return; } // hand it fully back to normal page scrolling
+    }
+    if (swipeAxis !== 'x') return;
+
+    // Hard stop at either edge — no give at all — so a disabled panel (e.g.
+    // About, when the cafe hasn't turned it on) never becomes even partly
+    // visible mid-drag. A soft rubber-band would still leak a sliver through.
+    const atLeftEdge = currentPanel === 0 && dx > 0;
+    const atRightEdge = currentPanel === maxPanel() && dx < 0;
+    dragDeltaX = (atLeftEdge || atRightEdge) ? 0 : dx;
+    updateTrackPosition(dragDeltaX, false);
+  }, { passive: true });
+  carousel.addEventListener('touchend', () => {
+    if (!dragging || swipeAxis !== 'x') { dragging = false; dragDeltaX = 0; return; }
+    dragging = false;
+    const threshold = carousel.clientWidth * 0.18;
+    let target = currentPanel;
+    if (dragDeltaX > threshold && currentPanel > 0) target--;
+    else if (dragDeltaX < -threshold && currentPanel < maxPanel()) target++;
+    dragDeltaX = 0;
+    goToPanel(target);
+  });
+  window.addEventListener('resize', () => updateTrackPosition(0, false));
+}
+
+let CALL_TXT = { idle: 'Call Waiter', sent: 'Waiter Called', toast: 'The waiter has been notified', noteT: 'Waiter notified', noteB: 'Someone from the cafe is on the way to your table.' };
+
+/* A hotel room's QR: the page opens with one big Call Room Service button (same call as the cafe's waiter call). */
+function applyRoomMode() {
+  if (!(tableInfo && tableInfo.is_room)) return;
+  const dining = !!(cafeInfo && cafeInfo.room_dining);
+  document.body.classList.add('is-room');
+  if (!dining) document.body.classList.add('no-dining');
+  CALL_TXT = { idle: 'Call Room Service', sent: 'Room Service Called', toast: 'Room service has been notified', noteT: 'Room service notified', noteB: 'Someone from the hotel team is on the way to your room.' };
+  const sub = document.querySelector('.header-subtitle'); if (sub) sub.textContent = dining ? 'Room service & in-room dining' : 'Room service';
+  const lbl = document.querySelector('label.note-label'); if (lbl) lbl.textContent = 'Message for room service (optional)';
+  const header = document.querySelector('#panel-menu header');
+  if (header && !document.getElementById('room-call')) {
+    const b = document.createElement('button');
+    b.id = 'room-call'; b.type = 'button'; b.className = 'room-call'; b.setAttribute('onclick', 'ringWaiter()');
+    b.innerHTML = '<span class="rc-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>' +
+      '<span class="rc-txt"><span class="rc-main" id="room-call-label">' + CALL_TXT.idle + '</span><span class="rc-sub">Tap and we’ll come to your room</span></span>';
+    header.insertAdjacentElement('afterend', b);
+    if (!dining) b.insertAdjacentHTML('afterend', '<div class="room-note">Need towels, a cleaning, or anything else? Tap the button above and our team will be with you shortly.</div>');
+  }
+}
+
+async function ringWaiter() {
+  const btns = Array.from(document.querySelectorAll('#call-btn, #room-call'));
+  const labels = Array.from(document.querySelectorAll('#call-btn-label, #room-call-label'));
+  const label = document.getElementById('room-call-label') || document.getElementById('call-btn-label');
+  const setAll = t => labels.forEach(l => { l.textContent = t; });
+  btns.forEach(b => { b.disabled = true; });
+  try {
+    const loc = await withLocationStatus(label, () => getLocation());
+    setAll('Sending…');
+    const res = await fetch(`${API_BASE}/calls`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ qr_token: qrToken, customer_latitude: loc.lat, customer_longitude: loc.lng, accuracy_meters: loc.accuracy }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Could not send call');
+    const call = await res.json();
+    setAll(CALL_TXT.sent);
+    btns.forEach(b => b.classList.add('sent'));
+    showToast(CALL_TXT.toast);
+    addNotification(CALL_TXT.noteT, CALL_TXT.noteB);
+    pollCallStatus(call.id);
+    setTimeout(() => { btns.forEach(b => { b.disabled = false; b.classList.remove('sent'); }); setAll(CALL_TXT.idle); }, 20000);
+  } catch (e) {
+    btns.forEach(b => { b.disabled = false; });
+    setAll(CALL_TXT.idle);
+    showToast(e.message);
+  }
+}
+
+let callStatusPollTimer = null;
+function pollCallStatus(callId) {
+  // On-screen only, not a real push — iOS Safari can't reliably deliver push
+  // to a plain browser tab without a PWA install, so polling while the page
+  // is open is what actually works here for every customer, not just some.
+  clearInterval(callStatusPollTimer);
+  let attempts = 0;
+  const MAX_ATTEMPTS = 40; // ~120s at 3s/poll — comfortably past the round-robin's worst case
+  callStatusPollTimer = setInterval(async () => {
+    attempts++;
+    if (attempts > MAX_ATTEMPTS) { clearInterval(callStatusPollTimer); return; }
+    try {
+      const res = await fetch(`${API_BASE}/calls/${callId}/status`);
+      if (!res.ok) return;
+      const call = await res.json();
+      if (call.status === 'acknowledged') {
+        clearInterval(callStatusPollTimer);
+        const name = call.acknowledged_by_name;
+        const msg = name ? `${name} is on the way!` : 'Someone is on the way!';
+        showToast(msg);
+        addNotification('On the way', msg);
+      } else if (call.status === 'missed') {
+        clearInterval(callStatusPollTimer);
+        showToast('No one picked this up yet — please try again');
+        addNotification('Still waiting', 'Nobody has responded yet — feel free to call again or wave someone down.');
+      }
+    } catch (e) { /* network hiccup — next poll retries */ }
+  }, 3000);
+}
+
+async function fetchOrderHistory() {
+  if (!qrToken) return;
+  try {
+    const res = await fetch(`${API_BASE}/order/${qrToken}/orders`);
+    if (!res.ok) return; // non-fatal — just try again next poll
+    orderHistory = await res.json();
+    if (currentPanel === 0) renderOrderPanel(); // only redraw if this panel's actually visible right now
+  } catch (e) { /* non-fatal — network hiccup, next poll will retry */ }
+}
+
+/* Placing an order feels instant: the moment the customer taps Confirm the cart clears,
+   they're taken back to the menu, and the order appears under "Ordered so far" as
+   "Sending…". The request itself runs in the background — waiting for a location fix and a
+   slow server used to leave the button sitting there for seconds.
+
+   Every attempt carries a token, so if the connection drops and it's retried, the server
+   hands back the SAME order instead of creating a second one. If it truly can't be sent,
+   the items go back into the cart with the reason — an order is never silently lost. */
+function cartSignature(items, note) { return JSON.stringify([items.map(i => i.menu_item_id + '|' + (i.kind || '') + '|' + (i.size || '') + '|' + (i.temperature || '') + '|' + ((i.addons || []).slice().sort().join('+')) + 'x' + i.quantity).sort(), note || '']); }
+function newOrderToken() { return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
+
+async function postOrderOnce(payload) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 15000);   // a hung request must not block the retry
+  try {
+    const res = await fetch(`${API_BASE}/orders`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: ctl.signal,
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(typeof data.detail === 'string' ? data.detail : 'Could not place order');
+      err.status = res.status;
+      throw err;
+    }
+    return res.json();
+  } finally { clearTimeout(timer); }
+}
+
+async function sendOrderInBackground(entry) {
+  const delays = [1000, 3000, 8000];
+  try {
+    const loc = await getLocation();   // usually already resolved — it's fetched when the page opens
+    const payload = {
+      qr_token: qrToken, customer_latitude: loc.lat, customer_longitude: loc.lng, accuracy_meters: loc.accuracy,
+      items: entry.apiItems, note: entry.note || null, client_token: entry.token,
+    };
+    let order;
+    for (let i = 0; ; i++) {
+      try { order = await postOrderOnce(payload); break; }
+      catch (e) {
+        const retryable = !e.status || e.status >= 500;   // a dropped connection or a server hiccup — not "you're too far away"
+        if (!retryable || i >= delays.length) throw e;
+        await new Promise(r => setTimeout(r, delays[i]));
+      }
+    }
+    try { rememberUsual(entry.apiItems); } catch (e) { /* optional */ }
+    // Slot the confirmed order straight into the list (no gap, no flicker); the poll reconciles later.
+    orderHistory = orderHistory.filter(o => o.id !== order.id).concat(order);
+    pendingOrders = pendingOrders.filter(p => p !== entry);
+    retryToken = null; retrySig = '';
+    renderOrderPanel();
+    fetchOrderHistory();
+    const num = order.order_number != null ? order.order_number : order.id;
+    document.getElementById('status-banner-slot').innerHTML = `<div class="status-banner">Order <b style="font-size:1.15em;">#${escapeHtml(String(num))}</b> placed — the cafe has it now. Keep this number handy.</div>`;
+    addNotification(`Order #${num} placed`, 'The cafe has received your order — mention this number if you need to ask about it.');
+  } catch (e) {
+    // Couldn't send: hand the items back (merged with anything added meanwhile) so nothing is lost.
+    pendingOrders = pendingOrders.filter(p => p !== entry);
+    entry.lines.forEach(l => { const ex = cart[l.id]; if (ex) ex.quantity += l.quantity; else { const c = Object.assign({}, l); delete c.id; cart[l.id] = c; } });
+    retryToken = entry.token; retrySig = entry.sig;   // re-confirming this same cart re-uses the token
+    renderMenu(); renderCartBar(); renderOrderPanel();
+    document.getElementById('status-banner-slot').innerHTML = '';
+    showToast((e.message || 'Could not send your order') + ' — your items are back in your order.');
+  }
+}
+
+function placeOrder() {
+  const { count, total } = cartTotals();
+  if (count === 0) return;
+  const noteEl = document.getElementById('order-note');
+  const note = noteEl.value.trim();
+  const apiItems = Object.values(cart).map(c => Object.assign({ menu_item_id: c.menu_item_id, quantity: c.quantity },
+    c.size ? { size: c.size } : {}, c.temperature ? { temperature: c.temperature } : {}, c.kind ? { kind: c.kind } : {}, (c.addons && c.addons.length) ? { addons: c.addons.map(a => a.name) } : {}));
+  const lines = Object.entries(cart).map(([id, c]) => Object.assign({}, c, { id }));
+  // Until the server stores size / hot-cold, also spell the choices out in the kitchen note.
+  const choiceNote = '';   // the server stores every choice on its own order line now (it used to be copied into the note)
+  const fullNote = [note, choiceNote].filter(Boolean).join(' — ');
+  const sig = cartSignature(apiItems, fullNote);
+  const entry = {
+    token: (retryToken && sig === retrySig) ? retryToken : newOrderToken(), sig, apiItems, note: fullNote, lines,
+    // shaped like a server order, so the "Ordered so far" list can draw it as-is
+    total_amount: total, _sending: true, status: 'sending', created_at: new Date().toISOString(),
+    items: lines.map(l => ({ name: l.name, quantity: l.quantity, price_at_order: l.price })),
+  };
+  pendingOrders.push(entry);
+  cart = {};
+  noteEl.value = '';
+  renderMenu();
+  renderCartBar();
+  renderOrderPanel();
+  goToPanel(1);                       // straight back to the menu
+  document.getElementById('status-banner-slot').innerHTML = '<div class="status-banner">Sending your order…</div>';
+  showToast('Order placed');
+  sendOrderInBackground(entry);
+}
+window.addEventListener('beforeunload', e => { if (pendingOrders.length) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ==== Ask for the bill ====
+   After the meal the guest taps "Ask for the bill" under "Ordered so far". That tells the cafe this
+   table is done — the dashboard's Orders tab flags the table "Bill requested" and alerts staff.
+   Backend: POST /order/{qr_token}/bill-request  → marks the table's open orders with bill_requested_at
+   (the orders list returns that field, so the request survives a page reload). Until the backend has
+   it, this falls back to the normal waiter call so staff are still pinged. */
+function billKey() { return 'xyzzy-bill-' + qrToken; }
+function billSig(list) { return list.map(o => o.id).sort().join(','); }
+function renderBillAsk(list) {
+  const host = document.getElementById('bill-ask');
+  if (!host) return;
+  const real = list.filter(o => !o._sending);
+  if (!real.length) { host.innerHTML = ''; return; }
+  let asked = real.every(o => o.bill_requested_at);
+  if (!asked) { try { asked = sessionStorage.getItem(billKey()) === billSig(real); } catch (e) {} }
+  const total = real.reduce((s, o) => s + (Number(o.total_amount) || 0), 0);
+  if (asked) {
+    host.innerHTML = '<div class="bill-ok"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><div><b>Bill requested</b>Your waiter is bringing it over. Total so far: ₹' + total + '</div></div>';
+    return;
+  }
+  const sending = list.some(o => o._sending);
+  host.innerHTML = '<button class="bill-btn" id="bill-btn" onclick="requestBill()"' + (sending ? ' disabled' : '') + '><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 1 .7V2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg><span id="bill-btn-label">Done eating? Ask for the bill · ₹' + total + '</span></button><div class="bill-hint">' + (sending ? 'Wait for your last order to go through first.' : 'Your waiter will bring it to the table.') + '</div>';
+}
+async function requestBill() {
+  if (!orderHistory.some(o => !o._sending)) return;
+  // Instant: the guest sees "Bill requested" the moment they tap; the request goes out in the background and is undone only if it fails.
+  const before = orderHistory.map(o => o.bill_requested_at);
+  const now = new Date().toISOString();
+  orderHistory.forEach(o => { o.bill_requested_at = o.bill_requested_at || now; });
+  try { sessionStorage.setItem(billKey(), billSig(orderHistory.filter(o => !o._sending))); } catch (e) {}
+  showToast('Your bill is on its way');
+  renderOrderPanel();
+  try {
+    let res = await fetch(`${API_BASE}/order/${qrToken}/bill-request`, { method: 'POST' });
+    if (res.status === 404 || res.status === 405) {            // backend doesn't have bill requests yet → ring the waiter instead
+      const loc = await getLocation();
+      res = await fetch(`${API_BASE}/calls`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qr_token: qrToken, customer_latitude: loc.lat, customer_longitude: loc.lng, accuracy_meters: loc.accuracy }),
+      });
+    }
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Could not ask for the bill');
+    addNotification('Bill requested', 'Your waiter has been told you\u2019re done and will bring the bill.');
+  } catch (e) {
+    orderHistory.forEach((o, i) => { o.bill_requested_at = before[i] || null; });
+    try { sessionStorage.removeItem(billKey()); } catch (e2) {}
+    showToast(typeof e.message === 'string' ? e.message : 'Could not ask for the bill');
+    renderOrderPanel();
+  }
+}
+
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+initCarouselSwipe();
+loadMenu();
+getLocation(); // kicked off immediately, in parallel with the menu — usually resolved before anyone taps a button
+</script>
+<!-- ==== Category jump menu ====
+     A small floating button above Call Waiter / Your Order. Tapping it opens a
+     panel upwards listing every section with its item count; tapping one scrolls
+     there. Its colours are copied at runtime from the theme's own "Your Order"
+     pill, so it matches whatever template the cafe picked (and the preview). -->
+<style>
+  /* The scrollable category chips under the search bar are switched off — the Menu
+     button below replaces them. The chips are still built (hidden), because they're
+     what tracks which section you're looking at for the Menu panel's highlight. */
+  #category-scrollbar { display: none !important; }
+  .catnav-btn {
+    position: fixed; z-index: 62; left: 16px; bottom: 96px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px 10px 13px; border-radius: 999px; border: 1px solid transparent;
+    font: 600 14px/1 'Inter', system-ui, sans-serif; cursor: pointer;
+    background: #171A21; color: #fff;
+    box-shadow: 0 12px 26px -12px rgba(0,0,0,.55);
+    -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+    transition: opacity .2s ease, transform .25s cubic-bezier(.34,1.56,.64,1), visibility 0s linear 0s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .catnav-btn[hidden] { display: inline-flex; opacity: 0; transform: translateY(12px) scale(.9); pointer-events: none; visibility: hidden; transition: opacity .2s ease, transform .2s ease, visibility 0s linear .2s; }
+  .catnav-btn:active { transform: scale(.94); }
+  .catnav-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  .catnav-btn svg { flex: 0 0 auto; }
+  .catnav-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.38); opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s linear .2s; }
+  .catnav-backdrop.open { opacity: 1; visibility: visible; transition-delay: 0s; }
+  .catnav-panel {
+    position: fixed; z-index: 61; left: 16px; bottom: 150px; box-sizing: border-box;
+    width: min(360px, calc(100vw - 32px)); max-height: min(60vh, 520px); overflow-y: auto; overscroll-behavior: contain;
+    padding: 10px 6px; border-radius: 22px;
+    background: rgba(28,30,38,.92); color: #fff;
+    -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%);
+    box-shadow: 0 24px 50px -18px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+    transform-origin: bottom left; transform: translateY(10px) scale(.85); opacity: 0; visibility: hidden;
+    transition: transform .28s cubic-bezier(.34,1.3,.64,1), opacity .18s ease, visibility 0s linear .28s;
+  }
+  .catnav-panel.open { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
+  .catnav-row {
+    all: unset; box-sizing: border-box; width: 100%; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 13px 16px; border-radius: 14px; font: 500 15px/1.25 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .catnav-row:hover, .catnav-row:focus-visible { background: rgba(127,127,127,.14); }
+  .catnav-row:active { background: rgba(127,127,127,.22); }
+  .catnav-row .catnav-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .catnav-row .catnav-count { flex: 0 0 auto; font-variant-numeric: tabular-nums; opacity: .8; }
+  .catnav-row.big { font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: 13.5px; margin-top: 4px; }
+  .catnav-row.sub { padding-left: 30px; font-size: 14px; }
+  .catnav-row.current { font-weight: 700; color: var(--catnav-accent, #FF9770); }
+  .catnav-row.current .catnav-count { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .catnav-btn, .catnav-panel, .catnav-backdrop { transition: none; } }
+</style>
+<div class="catnav-backdrop" id="catnav-backdrop"></div>
+<div class="catnav-panel" id="catnav-panel" role="menu" aria-label="Menu sections"></div>
+<button class="catnav-btn" id="catnav-btn" hidden aria-expanded="false" aria-controls="catnav-panel">
+  <svg id="catnav-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+  <span id="catnav-label">Menu</span>
+</button>
+<script>
+(function categoryJumpMenu() {
+  const btn = document.getElementById('catnav-btn');
+  const panel = document.getElementById('catnav-panel');
+  const backdrop = document.getElementById('catnav-backdrop');
+  const icon = document.getElementById('catnav-icon');
+  const label = document.getElementById('catnav-label');
+  const ICON_MENU = '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>';
+  const ICON_CLOSE = '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>';
+  icon.innerHTML = ICON_MENU;
+  let sections = [];   // [{ name, slug, count }]
+  let isOpen = false;
+
+  /* ---- colours: borrow them from the theme's own "Your Order" pill ---- */
+  const isClear = c => !c || c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c);
+  const rgbOf = c => { const m = /rgba?\(([^)]+)\)/.exec(c || ''); return m ? m[1].split(',').slice(0, 3).map(v => parseFloat(v)) : null; };
+  const lum = rgb => rgb ? (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) : 0;
+  function solidBackground(el) {
+    for (; el && el !== document.documentElement; el = el.parentElement) {
+      const c = getComputedStyle(el).backgroundColor;
+      if (!isClear(c)) return c;
+    }
+    return getComputedStyle(document.body).backgroundColor || 'rgb(255,255,255)';
+  }
+  function applyThemeColours() {
+    const pill = document.getElementById('cart-btn') || document.getElementById('call-btn');
+    if (!pill) return;
+    const cs = getComputedStyle(pill);
+    btn.style.background = 'none';
+    btn.style.backgroundColor = cs.backgroundColor;
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') btn.style.backgroundImage = cs.backgroundImage;
+    btn.style.color = cs.color;
+    btn.style.borderColor = isClear(cs.borderTopColor) ? 'transparent' : cs.borderTopColor;
+    btn.style.borderRadius = cs.borderTopLeftRadius;
+    btn.style.fontFamily = cs.fontFamily;
+    if (cs.boxShadow && cs.boxShadow !== 'none') btn.style.boxShadow = cs.boxShadow;
+    // If the pill itself is see-through (glassy themes), fall back to the page colour so the button stays readable.
+    if (isClear(cs.backgroundColor) && (!cs.backgroundImage || cs.backgroundImage === 'none')) {
+      btn.style.backgroundColor = solidBackground(pill.parentElement);
+    }
+    // Panel: the theme's own card surface (--paper) and text colour (--ink), read straight from the
+    // theme. (Reading the page's background doesn't work on the animated themes — it's see-through
+    // there, which used to turn the panel black with dark text on it.)
+    const rootCss = getComputedStyle(document.documentElement);
+    const tok = name => rootCss.getPropertyValue(name).trim();
+    const toRgb = c => { c = (c || '').trim(); const h = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c);
+      if (h) { let x = h[1]; if (x.length === 3) x = x.split('').map(ch => ch + ch).join(''); return [0, 2, 4].map(i => parseInt(x.substr(i, 2), 16)); }
+      const m = rgbOf(c); return m && !isClear(c) ? m : null; };
+    const menuPanel = document.getElementById('panel-menu') || document.body;
+    const bg = toRgb(tok('--paper')) || toRgb(tok('--cream')) || rgbOf(solidBackground(menuPanel)) || [255, 255, 255];
+    let text = tok('--ink') || getComputedStyle(menuPanel).color;
+    if (Math.abs(lum(toRgb(text)) - lum(bg)) < 90) text = lum(bg) > 140 ? '#1A1D24' : '#F5F2EA';   // never dark-on-dark
+    panel.style.background = `rgba(${bg.map(Math.round).join(',')}, .95)`;
+    panel.style.color = text;
+    panel.style.border = `1px solid ${tok('--glass-line') || tok('--border') || 'rgba(127,127,127,.25)'}`;
+    panel.style.fontFamily = tok('--font-body') || getComputedStyle(menuPanel).fontFamily;
+    // Highlight for the section you're in: the theme's price / accent colour, whichever reads on the panel.
+    let accent = [tok('--olive-dark'), tok('--terracotta'), tok('--olive'), isClear(cs.backgroundColor) ? cs.color : cs.backgroundColor]
+      .find(c => toRgb(c) && Math.abs(lum(toRgb(c)) - lum(bg)) >= 60) || text;
+    panel.style.setProperty('--catnav-accent', accent);
+  }
+
+  /* ---- position: just above the bottom bar, lined up with its left edge ---- */
+  function place() {
+    const bar = document.querySelector('.bottom-bar');
+    const r = bar ? bar.getBoundingClientRect() : null;
+    const left = r && r.width ? Math.max(12, r.left + 4) : 16;
+    const bottom = r && r.height ? Math.max(16, window.innerHeight - r.top + 12) : 96;
+    btn.style.left = left + 'px'; btn.style.bottom = bottom + 'px';
+    panel.style.left = left + 'px'; panel.style.bottom = (bottom + btn.offsetHeight + 10) + 'px';
+  }
+
+  /* ---- which sections exist, and how many items each has (read from the rendered menu) ---- */
+  function readSections() {
+    sections = [...document.querySelectorAll('#menu-wrap .category-block, #menu-wrap .menu-section')].map(block => {
+      const isSec = block.classList.contains('menu-section');
+      return {
+        slug: block.id, big: isSec, sub: !isSec && !!block.closest('.menu-section'),
+        name: (block.querySelector(isSec ? '.menu-section-title' : '.category-title') || {}).textContent || '',
+        count: block.querySelectorAll(isSec ? '.menu-item' : '.category-items > .menu-item').length,
+      };
+    }).filter(s => s.name && s.count);
+  }
+  function currentSlug() {
+    const active = document.querySelector('#category-scrollbar .category-chip.active');
+    return active ? active.dataset.target : (sections[0] && sections[0].slug);
+  }
+  function renderPanel() {
+    const cur = currentSlug();
+    panel.innerHTML = sections.map(s => `
+      <button class="catnav-row ${s.slug === cur ? 'current' : ''} ${s.big ? 'big' : ''} ${s.sub ? 'sub' : ''}" role="menuitem" data-slug="${s.slug}">
+        <span class="catnav-name">${escapeHtml(s.name)}</span><span class="catnav-count">${s.count}</span>
+      </button>`).join('');
+  }
+
+  /* ---- show only on the menu page, once the cover has flipped, with 2+ sections, not mid-search ---- */
+  function updateVisibility() {
+    const flipper = document.getElementById('flipper');
+    const show = !!(flipper && flipper.classList.contains('settled')) &&
+      typeof currentPanel !== 'undefined' && currentPanel === 1 &&
+      !searchQuery && sections.length >= 2;
+    if (!show && isOpen) close();
+    btn.hidden = !show;
+    if (show) place();
+  }
+
+  function open() {
+    if (isOpen) return;
+    applyThemeColours(); readSections(); renderPanel(); place();
+    isOpen = true;
+    panel.classList.add('open'); backdrop.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    icon.innerHTML = ICON_CLOSE; label.textContent = 'Close';
+    const cur = panel.querySelector('.catnav-row.current');
+    panel.scrollTop = cur ? Math.max(0, cur.offsetTop - panel.clientHeight / 2 + cur.offsetHeight / 2) : 0;
+  }
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+    panel.classList.remove('open'); backdrop.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    icon.innerHTML = ICON_MENU; label.textContent = 'Menu';
+  }
+  btn.addEventListener('click', () => (isOpen ? close() : open()));
+  backdrop.addEventListener('click', close);
+  panel.addEventListener('click', e => {
+    const row = e.target.closest('.catnav-row');
+    if (!row) return;
+    close();
+    jumpToCategory(row.dataset.slug);
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen) { close(); btn.focus(); } });
+
+  /* ---- keep in step with the page: re-read sections after each menu render, re-check on panel changes ---- */
+  const origRenderCategoryBar = window.renderCategoryBar;
+  window.renderCategoryBar = function (names) {
+    const r = origRenderCategoryBar.apply(this, arguments);
+    readSections(); applyThemeColours(); updateVisibility();
+    return r;
+  };
+  const origGoToPanel = window.goToPanel;
+  window.goToPanel = function () { const r = origGoToPanel.apply(this, arguments); updateVisibility(); return r; };
+  window.addEventListener('resize', () => { if (!btn.hidden) place(); });
+  // The cover flip and the theme's stylesheet both finish on their own clocks — re-check a few times, then settle.
+  const flipper = document.getElementById('flipper');
+  if (flipper) new MutationObserver(() => { applyThemeColours(); updateVisibility(); }).observe(flipper, { attributes: true, attributeFilter: ['class'] });
+  const skin = document.getElementById('template-skin-css');
+  if (skin) skin.addEventListener('load', () => { applyThemeColours(); if (!btn.hidden) place(); });
+  setInterval(updateVisibility, 700);   // cheap: catches swipes between panels and search changes
+})();
+</script>
+<!-- ==== Customer feedback / reviews ====
+     A "Rate your visit" card at the end of the menu and on the Your Order page, opening a
+     sheet: tap 1–5 stars, pick what stood out (or what could be better), add a comment and
+     an optional name. Uses the theme's own sheet, colours and fonts, so it fits every
+     template. Sends POST /order/{qr_token}/feedback. One review per table per visit
+     (remembered on the phone). If the cafe has a Google review link, happy guests are
+     invited to share it there too. -->
+<style>
+  .fb-card { margin: 26px 0 8px; padding: 16px; border-radius: var(--item-r, 18px); border: 1px solid var(--glass-line, var(--border));
+    background: var(--glass, var(--paper)); -webkit-backdrop-filter: blur(var(--glass-blur, 8px)); backdrop-filter: blur(var(--glass-blur, 8px));
+    text-align: center; color: var(--ink); }
+  .fb-card h3 { margin: 0 0 4px; font-family: var(--font-head); font-size: 20px; font-weight: var(--head-w, 600); }
+  .fb-card p { margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); }
+  .fb-stars { display: inline-flex; gap: 6px; }
+  .fb-star { all: unset; cursor: pointer; width: 34px; height: 34px; display: grid; place-items: center; color: var(--fb-star-off, rgba(127,127,127,.45)); -webkit-tap-highlight-color: transparent; }
+  .fb-star svg { width: 100%; height: 100%; transition: transform .18s cubic-bezier(.34,1.56,.64,1); }
+  .fb-star.on { color: var(--fb-star, #F5B301); }
+  .fb-star.on svg { filter: drop-shadow(0 2px 6px rgba(245,179,1,.45)); }
+  .fb-star.pop svg { transform: scale(1.3) rotate(-8deg); }
+  .fb-star:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; border-radius: 8px; }
+  .fb-sheet .fb-stars { display: flex; justify-content: center; gap: 10px; margin: 2px 0 6px; }
+  .fb-sheet .fb-star { width: 44px; height: 44px; }
+  .fb-mood { text-align: center; font-weight: 700; font-size: 15px; min-height: 22px; color: var(--ink); margin-bottom: 14px; }
+  .fb-q { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin: 6px 0 8px; }
+  .fb-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .fb-tag { all: unset; cursor: pointer; padding: 8px 13px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink); border: 1px solid var(--glass-line, var(--border)); background: transparent; }
+  .fb-tag[aria-pressed="true"] { background: var(--olive); border-color: var(--olive); color: var(--on-primary, #fff); }
+  .fb-input { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; color: var(--ink); background: transparent; border: 1px solid var(--glass-line, var(--border)); border-radius: 12px; padding: 11px 12px; margin-bottom: 10px; resize: vertical; }
+  .fb-input:focus { outline: 2px solid var(--terracotta); outline-offset: 0; background: var(--note-focus-bg, transparent); }
+  .fb-input::placeholder { color: var(--text-secondary); opacity: .8; }
+  .fb-send { width: 100%; margin-top: 4px; }
+  .fb-send[disabled] { opacity: .5; pointer-events: none; }
+  .fb-thanks { text-align: center; padding: 10px 4px 6px; }
+  .fb-thanks .fb-big { font-family: var(--font-head); font-size: 24px; font-weight: var(--head-w, 600); margin: 8px 0 4px; color: var(--ink); }
+  .fb-thanks p { color: var(--text-secondary); font-size: 13.5px; margin: 0 0 14px; }
+  .fb-google { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; background: #fff; color: #1F1F1F; border: 1px solid rgba(0,0,0,.12); }
+  .fb-done-stars { color: var(--fb-star, #F5B301); letter-spacing: 2px; font-size: 18px; }
+  @media (prefers-reduced-motion: reduce) { .fb-star svg { transition: none; } }
+</style>
+<div class="sheet-backdrop" id="fb-backdrop" onclick="if (event.target === this) Feedback.close()">
+  <div class="sheet fb-sheet" role="dialog" aria-modal="true" aria-labelledby="fb-title">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top-row">
+      <h2 id="fb-title">Rate your visit</h2>
+      <button class="close-sheet" onclick="Feedback.close()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div id="fb-body"></div>
+  </div>
+</div>
+<script>
+const Feedback = (function () {
+  const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.3l-5.8 3.1 1.2-6.5L2.6 9.4l6.5-.8z"/></svg>';
+  const MOODS = ['', 'Poor', 'Not great', 'Okay', 'Good', 'Loved it!'];
+  const GOOD = ['Food', 'Service', 'Ambience', 'Value for money', 'Quick service', 'Cleanliness'];
+  const BAD = ['Food', 'Slow service', 'Staff behaviour', 'Prices', 'Cleanliness', 'Noise'];
+  let rating = 0, tags = new Set(), sending = false;
+  const key = () => 'xyzzy-fb-' + (qrToken || 'demo') + '-' + new Date().toDateString();   // one review per table per day
+  const done = () => { try { return JSON.parse(localStorage.getItem(key()) || 'null'); } catch (_) { return null; } };
+  const cafeName = () => (typeof cafeInfo !== 'undefined' && cafeInfo && cafeInfo.name) || 'us';
+  const googleUrl = () => (typeof cafeInfo !== 'undefined' && cafeInfo && /^https:\/\//.test(cafeInfo.google_review_url || '')) ? cafeInfo.google_review_url : '';
+  const stars = (n, cls) => [1, 2, 3, 4, 5].map(i => `<button type="button" class="fb-star ${i <= n ? 'on' : ''}" data-star="${i}" aria-label="${i} star${i > 1 ? 's' : ''}" aria-pressed="${i <= n}">${STAR}</button>`).join('');
+
+  /* ---- the small "Rate your visit" cards (end of the menu, and Your Order) ---- */
+  function cardHtml() {
+    const d = done();
+    if (d) return `<div class="fb-card"><h3>Thanks for the review!</h3><p>You rated your visit</p><div class="fb-done-stars" aria-label="${d.rating} out of 5">${'★'.repeat(d.rating)}${'☆'.repeat(5 - d.rating)}</div></div>`;
+    return `<div class="fb-card"><h3>Enjoying ${escapeHtml(cafeName())}?</h3><p>Tap the stars to rate your visit</p><div class="fb-stars" role="group" aria-label="Rate your visit">${stars(0)}</div></div>`;
+  }
+  function renderCards() {
+    ['fb-menu-slot', 'fb-order-slot'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = cardHtml(); });
+  }
+  document.addEventListener('click', e => {
+    const s = e.target.closest('.fb-card [data-star]');
+    if (s) { open(Number(s.dataset.star)); }
+  });
+
+  /* ---- the sheet ---- */
+  function render() {
+    const body = document.getElementById('fb-body');
+    const d = done();
+    if (d) {
+      const g = googleUrl();
+      body.innerHTML = `<div class="fb-thanks"><div class="fb-done-stars" style="font-size:26px;">${'★'.repeat(d.rating)}${'☆'.repeat(5 - d.rating)}</div>
+        <div class="fb-big">Thank you!</div>
+        <p>${d.rating >= 4 ? `So glad you enjoyed it — the team at ${escapeHtml(cafeName())} will love reading this.` : `Sorry it wasn’t perfect. ${escapeHtml(cafeName())} will see your feedback and work on it.`}</p>
+        ${d.rating >= 4 && g ? `<a class="fb-google" href="${g}" target="_blank" rel="noopener">Share it on Google too</a>` : ''}</div>`;
+      return;
+    }
+    const list = rating && rating <= 3 ? BAD : GOOD;
+    body.innerHTML = `
+      <div class="fb-stars" role="group" aria-label="Your rating">${stars(rating)}</div>
+      <div class="fb-mood" aria-live="polite">${MOODS[rating] || 'Tap a star'}</div>
+      ${rating ? `<div class="fb-q">${rating <= 3 ? 'What could be better?' : 'What did you love?'}</div>
+      <div class="fb-tags">${list.map(t => `<button type="button" class="fb-tag" data-tag="${escapeHtml(t)}" aria-pressed="${tags.has(t)}">${escapeHtml(t)}</button>`).join('')}</div>
+      <textarea class="fb-input" id="fb-comment" rows="3" maxlength="600" placeholder="${rating <= 3 ? 'Tell us what went wrong — it really helps' : 'Anything you’d like to tell the team? (optional)'}">${escapeHtml(body._comment || '')}</textarea>
+      <input class="fb-input" id="fb-name" maxlength="60" placeholder="Your name (optional)" value="${escapeHtml(body._name || '')}" autocomplete="given-name">
+      <button class="place-order-btn fb-send" id="fb-send">Send review</button>` : ''}`;
+  }
+  function popStar(n) {
+    const b = document.querySelector(`#fb-body [data-star="${n}"]`);
+    if (b) { b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 200); }
+  }
+  const body = () => document.getElementById('fb-body');
+  document.getElementById('fb-body').addEventListener('input', e => {
+    if (e.target.id === 'fb-comment') body()._comment = e.target.value;
+    if (e.target.id === 'fb-name') body()._name = e.target.value;
+  });
+  document.getElementById('fb-body').addEventListener('click', async e => {
+    const s = e.target.closest('[data-star]');
+    if (s) {
+      const was = rating;
+      rating = Number(s.dataset.star);
+      if ((was <= 3) !== (rating <= 3)) tags = new Set();   // switched between "loved" and "could be better"
+      render(); popStar(rating); return;
+    }
+    const t = e.target.closest('[data-tag]');
+    if (t) { const v = t.dataset.tag; tags.has(v) ? tags.delete(v) : tags.add(v); t.setAttribute('aria-pressed', tags.has(v)); return; }
+    if (e.target.closest('#fb-send')) send();
+  });
+
+  async function send() {
+    if (sending || !rating) return;
+    const btn = document.getElementById('fb-send');
+    sending = true; btn.disabled = true; btn.textContent = 'Sending…';
+    const payload = {
+      rating, tags: [...tags],
+      comment: (document.getElementById('fb-comment').value || '').trim() || null,
+      name: (document.getElementById('fb-name').value || '').trim() || null,
+    };
+    try {
+      const res = await fetch(`${API_BASE}/order/${encodeURIComponent(qrToken)}/feedback`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(res.status === 404 || res.status === 405 ? 'Reviews aren’t switched on here yet' : 'Couldn’t send — please try again');
+      try { localStorage.setItem(key(), JSON.stringify({ rating, at: Date.now() })); } catch (_) {}
+      render(); renderCards();
+      if (typeof addNotification === 'function') addNotification('Review sent', 'Thanks for rating your visit!');
+    } catch (err) {
+      showToast(err.message === 'Failed to fetch' ? 'No connection — please try again' : err.message);
+      btn.disabled = false; btn.textContent = 'Send review';
+    } finally { sending = false; }
+  }
+
+  function open(startRating) {
+    if (!done()) { if (startRating) rating = startRating; }
+    render();
+    document.getElementById('fb-backdrop').classList.add('show');
+    if (startRating) setTimeout(() => popStar(startRating), 60);
+  }
+  function close() { document.getElementById('fb-backdrop').classList.remove('show'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('fb-backdrop').classList.contains('show')) close(); });
+
+  // Draw the cards once the menu is on screen (cafe name known).
+  const wait = setInterval(() => { if (typeof cafeInfo !== 'undefined' && cafeInfo) { clearInterval(wait); renderCards(); } }, 300);
+  return { open, close, renderCards };
+})();
+</script>
+<!-- ==== Live weather on the menu ====
+     The menu mirrors the sky outside the cafe: rain streaks behind the cards when it's
+     raining (heavier in a downpour, slanted by the wind), lightning flashes in a
+     thunderstorm, snow, or a drifting haze in fog — on top of whatever template the cafe
+     uses — plus a small "Raining outside · 26°" chip under the cafe name.
+     Weather comes from Open-Meteo (free, no key) for the cafe's location, refreshed every
+     15 minutes. Location: the cafe's own latitude/longitude if the menu data includes them,
+     otherwise the guest's location only if they've ALREADY allowed it (never asks just for
+     this). Follows the cafe's "background effects" switch (chip only when that's off) and
+     reduced-motion. Try any weather with ?weather=rain | storm | drizzle | snow | fog | clear. -->
+<style>
+  .wx-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+  .wx-dim { position: fixed; inset: 0; pointer-events: none; z-index: -1; transition: background .8s ease; }
+  .wx-flash { position: fixed; inset: 0; pointer-events: none; z-index: 60; background: rgba(235,242,255,.0); }
+  .wx-flash.on { animation: wxFlash .9s ease-out; }
+  @keyframes wxFlash { 0% { background: rgba(235,242,255,0); } 6% { background: rgba(235,242,255,.55); } 14% { background: rgba(235,242,255,.08); } 22% { background: rgba(235,242,255,.4); } 100% { background: rgba(235,242,255,0); } }
+  .wx-fog { position: fixed; inset: -10% -50%; pointer-events: none; z-index: -1; opacity: 0; transition: opacity 1.2s ease;
+    background: radial-gradient(40% 30% at 20% 40%, rgba(235,238,242,.55), transparent 70%), radial-gradient(45% 35% at 70% 65%, rgba(235,238,242,.5), transparent 70%), radial-gradient(35% 28% at 45% 15%, rgba(235,238,242,.4), transparent 70%);
+    animation: wxFog 38s linear infinite alternate; }
+  .wx-fog.on { opacity: 1; }
+  @keyframes wxFog { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+  .wx-chip { display: inline-flex; align-items: center; gap: 6px; margin: 8px auto 0; padding: 5px 11px; border-radius: 999px; font: 600 11.5px/1.1 var(--font-body, 'Inter', sans-serif);
+    color: var(--ink); background: var(--glass, rgba(255,255,255,.6)); border: 1px solid var(--glass-line, var(--border)); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .wx-chip svg { flex: 0 0 auto; }
+  .wx-chip[hidden] { display: none; }
+  @media (prefers-reduced-motion: reduce) { .wx-fog { animation: none; } .wx-flash.on { animation: none; } }
+</style>
+<script>
+const LiveWeather = (function () {
+  const FORCE = new URLSearchParams(location.search).get('weather');
+  const CACHE = 'xyzzy-wx';
+  const reduced = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LOW = () => ((navigator.hardwareConcurrency || 4) <= 4) || innerWidth < 420;
+  let kind = 'clear', intensity = 0, wind = 0, temp = null, isDay = 1, canvas = null, g = null, raf = 0, parts = [], flashT = 0;
+
+  /* WMO weather codes → what to draw */
+  function classify(code) {
+    if ([95, 96, 99].includes(code)) return ['storm', 1];
+    if ([65, 82, 67].includes(code)) return ['rain', 1];
+    if ([63, 81, 66].includes(code)) return ['rain', .65];
+    if ([61, 80].includes(code)) return ['rain', .4];
+    if ([51, 53, 55, 56, 57].includes(code)) return ['drizzle', .25];
+    if ([71, 73, 75, 77, 85, 86].includes(code)) return ['snow', code === 75 || code === 86 ? 1 : .55];
+    if ([45, 48].includes(code)) return ['fog', 1];
+    if ([2, 3].includes(code)) return ['cloudy', 0];
+    return ['clear', 0];
+  }
+  const LABEL = { storm: 'Thunderstorm outside', rain: 'Raining outside', drizzle: 'Drizzling outside', snow: 'Snowing outside', fog: 'Foggy outside', cloudy: 'Cloudy outside', clear: 'Clear skies outside' };
+  const ICON = {
+    rain: '<path d="M7 15a4 4 0 1 1 .9-7.9A5 5 0 0 1 17.6 9 3.5 3.5 0 0 1 17 16H7Z"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/>',
+    storm: '<path d="M7 14a4 4 0 1 1 .9-7.9A5 5 0 0 1 17.6 8 3.5 3.5 0 0 1 17 15"/><path d="M12 13l-2 4h3l-2 4"/>',
+    snow: '<path d="M7 14a4 4 0 1 1 .9-7.9A5 5 0 0 1 17.6 8 3.5 3.5 0 0 1 17 15H7Z"/><path d="M9 19h.01M12 21h.01M15 19h.01"/>',
+    fog: '<path d="M4 9h16M3 13h18M5 17h14"/>',
+    cloudy: '<path d="M7 18a4 4 0 1 1 .9-7.9A5 5 0 0 1 17.6 12 3.5 3.5 0 0 1 17 19H7Z"/>',
+    clear: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  };
+  ICON.drizzle = ICON.rain;
+
+  /* ---- where & what ---- */
+  async function coords() {
+    const c = typeof cafeInfo !== 'undefined' && cafeInfo;
+    if (c && isFinite(c.latitude) && isFinite(c.longitude) && c.latitude !== null) return { lat: +c.latitude, lng: +c.longitude };
+    try {   // only if the guest has already allowed location (e.g. for Call Waiter) — never prompt just for weather
+      const p = navigator.permissions && await navigator.permissions.query({ name: 'geolocation' });
+      if (p && p.state === 'granted') return await new Promise(res => navigator.geolocation.getCurrentPosition(
+        pos => res({ lat: pos.coords.latitude, lng: pos.coords.longitude }), () => res(null), { maximumAge: 30 * 60000, timeout: 6000 }));
+    } catch (_) {}
+    return null;
+  }
+  async function fetchWeather() {
+    if (FORCE) return { code: { rain: 63, storm: 95, drizzle: 53, snow: 73, fog: 45, cloudy: 3, clear: 0 }[FORCE] ?? 0, temp: 26, wind: 12, is_day: 1 };
+    try { const c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); if (c && Date.now() - c.at < 15 * 60000) return c.w; } catch (_) {}
+    const at = await coords();
+    if (!at) return null;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${at.lat.toFixed(3)}&longitude=${at.lng.toFixed(3)}&current=weather_code,temperature_2m,wind_speed_10m,is_day`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const cur = (await res.json()).current || {};
+    const w = { code: cur.weather_code, temp: cur.temperature_2m, wind: cur.wind_speed_10m, is_day: cur.is_day };
+    try { sessionStorage.setItem(CACHE, JSON.stringify({ at: Date.now(), w })); } catch (_) {}
+    return w;
+  }
+
+  /* ---- the chip under the cafe name ---- */
+  function chip() {
+    let el = document.getElementById('wx-chip');
+    if (!el) {
+      const anchor = document.getElementById('table-chip');
+      if (!anchor) return;
+      el = document.createElement('div');
+      el.id = 'wx-chip'; el.className = 'wx-chip'; el.setAttribute('role', 'status');
+      const wrap = document.createElement('div'); wrap.style.textAlign = 'center';
+      wrap.appendChild(el);
+      anchor.insertAdjacentElement('afterend', wrap);
+    }
+    const icon = kind === 'clear' && !isDay ? ICON.moon : ICON[kind];
+    el.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon}</svg>${kind === 'clear' && !isDay ? 'Clear night outside' : LABEL[kind]}${temp != null ? ` · ${Math.round(temp)}°` : ''}`;
+    el.hidden = false;
+  }
+
+  /* ---- drawing ---- */
+  let _light = null;
+  function lightPage() {
+    if (_light !== null) return _light;
+    const c = (getComputedStyle(document.documentElement).getPropertyValue('--cream') || '').trim();
+    const m = /^#([0-9a-f]{6})$/i.exec(c);
+    if (!m) return (_light = true);
+    const n = parseInt(m[1], 16);
+    return (_light = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) > 150);
+  }
+  function size() { const d = Math.min(devicePixelRatio || 1, 1.5); canvas.width = innerWidth * d; canvas.height = innerHeight * d; g.setTransform(d, 0, 0, d, 0, 0); }
+  function seed() {
+    const W = innerWidth, H = innerHeight, scale = LOW() ? .55 : 1;
+    parts = [];
+    if (kind === 'rain' || kind === 'storm' || kind === 'drizzle') {
+      const n = Math.round((kind === 'drizzle' ? 60 : 90 + 150 * intensity) * scale);
+      for (let i = 0; i < n; i++) parts.push({ x: Math.random() * W, y: Math.random() * H, len: (kind === 'drizzle' ? 6 : 12) + Math.random() * (kind === 'drizzle' ? 6 : 16), v: (kind === 'drizzle' ? 380 : 700) + Math.random() * 500, a: .18 + Math.random() * .32 });
+    } else if (kind === 'snow') {
+      const n = Math.round((60 + 80 * intensity) * scale);
+      for (let i = 0; i < n; i++) parts.push({ x: Math.random() * W, y: Math.random() * H, r: .8 + Math.random() * 2.6, v: 20 + Math.random() * 50, ph: Math.random() * 6.28, a: .5 + Math.random() * .45 });
+    }
+  }
+  let last = 0;
+  function frame(t) {
+    raf = requestAnimationFrame(frame);
+    if (t - last < (LOW() ? 30 : 15)) return;
+    const dt = Math.min(.05, (t - last) / 1000 || .016); last = t;
+    draw(dt, t);
+  }
+  function draw(dt, t) {
+    const W = innerWidth, H = innerHeight;
+    g.clearRect(0, 0, W, H);
+    const slant = Math.max(-.45, Math.min(.45, (wind / 60))) ;     // stronger wind → more slanted rain
+    if (kind === 'snow') {
+      g.fillStyle = '#FFFFFF';
+      parts.forEach(p => {
+        p.y += p.v * dt; p.x += Math.sin(t * .0008 + p.ph) * 18 * dt + slant * 30 * dt;
+        if (p.y > H + 6) { p.y = -6; p.x = Math.random() * W; }
+        g.globalAlpha = p.a; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fill();
+      });
+    } else if (parts.length) {
+      g.strokeStyle = lightPage() ? '#5F7488' : '#D6E6F2'; g.lineWidth = lightPage() ? 1.2 : 1.1; g.lineCap = 'round';   // darker rain on light themes so it still shows
+      parts.forEach(p => {
+        p.y += p.v * dt; p.x += p.v * slant * dt;
+        if (p.y > H + 20) { p.y = -20; p.x = Math.random() * (W + 200) - 100; }
+        g.globalAlpha = p.a; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.len * slant, p.y - p.len); g.stroke();
+        if (p.y > H - 4 && Math.random() < .02) { g.globalAlpha = .35; g.beginPath(); g.arc(p.x, H - 3, 2.4, 3.14, 6.28); g.stroke(); }   // a tiny splash
+      });
+    }
+    g.globalAlpha = 1;
+    if (kind === 'storm' && t > flashT) {
+      flashT = t + 6000 + Math.random() * 9000;
+      const f = document.getElementById('wx-flash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
+    }
+  }
+
+  function start() {
+    // Same switch as the template's own effects ("Background effects" in the dashboard); ?weather= always shows it.
+    const animate = !!FORCE || !!(cafeInfo && cafeInfo.theme_effects_enabled && cafeInfo.weather_effects_enabled !== false);
+    if (!animate) return;
+    const dim = document.getElementById('wx-dim');
+    dim.style.background = { storm: 'rgba(10,16,28,.24)', rain: 'rgba(14,22,34,.14)', drizzle: 'rgba(14,22,34,.08)', snow: 'rgba(230,236,245,.10)', fog: 'rgba(225,230,236,.12)', cloudy: 'rgba(30,36,46,.05)', clear: 'transparent' }[kind];
+    document.getElementById('wx-fog').classList.toggle('on', kind === 'fog');
+    if (!['rain', 'storm', 'drizzle', 'snow'].includes(kind)) return;
+    canvas = document.createElement('canvas'); canvas.className = 'wx-canvas'; canvas.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(canvas);
+    g = canvas.getContext('2d'); if (!g) return;
+    size(); seed();
+    if (reduced()) { draw(.016, performance.now()); return; }   // one still frame
+    raf = requestAnimationFrame(frame);
+    addEventListener('resize', () => { size(); seed(); });
+    document.addEventListener('visibilitychange', () => { cancelAnimationFrame(raf); if (!document.hidden && !reduced()) { last = performance.now(); raf = requestAnimationFrame(frame); } });
+  }
+  function stopFx() { cancelAnimationFrame(raf); if (canvas) canvas.remove(); canvas = null; _light = null; }
+
+  async function update(first) {
+    try {
+      const w = await fetchWeather();
+      if (!w || w.code == null) return;
+      const [k, i] = classify(w.code);
+      const changed = k !== kind || i !== intensity;
+      kind = k; intensity = i; wind = w.wind || 0; temp = w.temp; isDay = w.is_day;
+      chip();
+      if (first || changed) { stopFx(); start(); }
+    } catch (_) { /* no weather is fine — the menu just stays as the template made it */ }
+  }
+
+  document.body.insertAdjacentHTML('beforeend', '<div class="wx-dim" id="wx-dim"></div><div class="wx-fog" id="wx-fog"></div><div class="wx-flash" id="wx-flash"></div>');
+  const wait = setInterval(() => {
+    if (typeof cafeInfo !== 'undefined' && cafeInfo) { clearInterval(wait); update(true); setInterval(() => update(false), 15 * 60000); }
+  }, 400);
+  return { refresh: () => update(false) };
+})();
+</script>
+<!-- ==== Secret menu ====
+     Items the cafe marks "Secret" never appear in the normal menu. Guests find them by pulling
+     the menu down from the very top (like Instagram's vanish mode): the screen goes dark from
+     the top, the cafe's name dissolves, "Secret menu" takes its place, and the secret items
+     appear with their names masked — "C*****" — until the guest holds the eye button.
+     Letting go hides the name again. Pull down again (or tap "Leave") to go back.
+     Desktop: scroll up past the top. Only exists when the cafe has at least one secret item. -->
+<style>
+  html.sm-ready { overscroll-behavior-y: none; }        /* our pull, not the browser's pull-to-refresh */
+  .sm-pull { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 10px); z-index: 80; pointer-events: none;
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; white-space: nowrap;
+    background: rgba(10,10,16,.86); color: #fff; font: 600 12.5px/1 var(--font-body, 'Inter', sans-serif);
+    transform: translate(-50%, calc(-140% + var(--p, 0) * 140%)); opacity: var(--p, 0); box-shadow: 0 10px 26px -10px rgba(0,0,0,.6); }
+  .sm-pull .sm-eye-ring { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+    background: conic-gradient(#fff calc(var(--p, 0) * 360deg), rgba(255,255,255,.2) 0); }
+  .sm-pull .sm-eye-ring span { width: 18px; height: 18px; border-radius: 50%; background: #0A0A10; display: grid; place-items: center; }
+  .sm-veil { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0; clip-path: circle(0% at 50% 0%);
+    background: radial-gradient(120% 70% at 50% 0%, rgba(40,26,70,.92), rgba(6,6,12,.96) 60%);
+    transition: clip-path .75s cubic-bezier(.65,0,.35,1), opacity .4s ease; }
+  body.sm-on .sm-veil { opacity: 1; clip-path: circle(150% at 50% 0%); }
+  .sm-veil i { position: absolute; bottom: -20px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); animation: smBubble linear infinite; }
+  @keyframes smBubble { from { transform: translateY(0); opacity: 0; } 15% { opacity: .8; } to { transform: translateY(-110vh); opacity: 0; } }
+  /* the cafe's name dissolves; "Secret menu" takes its place */
+  #cafe-name { transition: filter .6s ease, opacity .6s ease, letter-spacing .6s ease, transform .6s ease; }
+  body.sm-on #cafe-name { filter: blur(10px); opacity: 0; letter-spacing: .6em; transform: scale(1.08); }
+  .header-center { position: relative; }
+  .sm-title { position: absolute; left: 0; right: 0; top: 0; text-align: center; pointer-events: none; opacity: 0; transform: translateY(8px);
+    transition: opacity .5s ease .45s, transform .5s ease .45s; font: 700 30px/1.15 var(--font-head, serif); color: #fff; text-shadow: 0 0 18px rgba(170,140,255,.7); }
+  body.sm-on .sm-title { opacity: 1; transform: none; }
+  body.sm-on .header-subtitle, body.sm-on .table-chip, body.sm-on .wx-chip { color: #E6E1F5; }
+  body.sm-on #menu-wrap, body.sm-on #category-scrollbar, body.sm-on .search-wrap, body.sm-on #fb-menu-slot, body.sm-on .catnav-btn { display: none !important; }
+  #secret-wrap { display: none; }
+  body.sm-on #secret-wrap { display: block; animation: smIn .6s ease .35s both; }
+  @keyframes smIn { from { opacity: 0; transform: translateY(14px); } }
+  .sm-hint { text-align: center; color: #B9B2D4; font-size: 12.5px; margin: 6px 0 18px; }
+  .sm-item { display: flex; align-items: center; gap: 12px; padding: 14px; margin-bottom: 12px; border-radius: 16px; color: #F4F1FF;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .sm-item .mi-info { flex: 1; min-width: 0; }
+  .sm-name-row { display: flex; align-items: center; gap: 10px; }
+  .sm-name { font: 700 16px/1.25 var(--font-item, var(--font-body, sans-serif)); letter-spacing: .08em; overflow-wrap: anywhere; color: #F4F1FF; }
+  .sm-name.revealed { color: #fff; text-shadow: 0 0 12px rgba(170,140,255,.8); }
+  .sm-eye { all: unset; cursor: pointer; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(255,255,255,.1); color: #fff; -webkit-tap-highlight-color: transparent; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .sm-eye.held { background: rgba(170,140,255,.45); box-shadow: 0 0 16px rgba(170,140,255,.7); }
+  .sm-eye:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .sm-price { display: block; margin-top: 4px; color: #D9CCFF; font-weight: 700; font-size: 14px; }
+  .sm-item .qty-btn { border-color: rgba(255,255,255,.4); color: #fff; }
+  .sm-item .qty-num { color: #fff; }
+  .sm-leave { all: unset; cursor: pointer; display: block; margin: 8px auto 24px; padding: 9px 16px; border-radius: 999px; color: #E6E1F5; border: 1px solid rgba(255,255,255,.25); font-size: 13px; font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { .sm-veil, #cafe-name, .sm-title { transition: none; } .sm-veil i { display: none; } body.sm-on #secret-wrap { animation: none; } }
+</style>
+<style id="sm-fx">
+  /* opening / closing dynamics: the dark spreads from wherever you tapped, a ripple travels out, the menu dissolves, the secret items rise one by one */
+  html.sm-ready #cafe-name { cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .sm-veil { clip-path: circle(0% at var(--ox, 50%) var(--oy, 0%)); }
+  body.sm-on .sm-veil { clip-path: circle(150% at var(--ox, 50%) var(--oy, 0%)); }
+  .sm-ripple { position: fixed; left: 0; top: 0; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; pointer-events: none; z-index: 79;
+    border: 2px solid rgba(190,160,255,.9); box-shadow: 0 0 30px rgba(150,110,255,.7), inset 0 0 20px rgba(150,110,255,.5);
+    transform: translate(var(--rx), var(--ry)) scale(0); opacity: .9; animation: smRipple .95s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes smRipple { to { transform: translate(var(--rx), var(--ry)) scale(34); opacity: 0; } }
+  body.sm-leaving #menu-wrap, body.sm-leaving #category-scrollbar, body.sm-leaving .search-wrap { transition: opacity .24s ease, transform .24s ease, filter .24s ease; opacity: 0; transform: scale(.96) translateY(10px); filter: blur(6px); }
+  body.sm-on .sm-item { animation: smRise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(.5s + var(--i, 0) * 80ms); }
+  body.sm-on .sm-hint, body.sm-on .sm-leave { animation: smRise .6s ease .4s both; }
+  @keyframes smRise { from { opacity: 0; transform: translateY(26px) scale(.96); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+  /* inside the secret menu the "Café & Kitchen" line goes too — just "Secret menu" */
+  .header-subtitle { transition: opacity .35s ease, max-height .35s ease, margin .35s ease; max-height: 3em; }
+  body.sm-on .header-subtitle { opacity: 0; max-height: 0; margin: 0; overflow: hidden; pointer-events: none; }
+  /* the eye sits at the far right so a pressing thumb never covers the name */
+  .sm-item .sm-eye { width: 42px; height: 42px; margin-left: auto; touch-action: none; -webkit-touch-callout: none; user-select: none; }
+  .sm-item .sm-lock { font-size: 11.5px; color: #B9B2D4; margin-top: 2px; }
+  @media (prefers-reduced-motion: reduce) { .sm-ripple { display: none; } body.sm-on .sm-item, body.sm-on .sm-hint, body.sm-on .sm-leave { animation: none; } body.sm-leaving #menu-wrap, body.sm-leaving #category-scrollbar, body.sm-leaving .search-wrap { transition: none; opacity: 1; transform: none; filter: none; } }
+</style>
+<script>
+// "Cold Coffee" → "C*** ******": first character shown, every other letter masked, spaces kept.
+function maskName(name) {
+  const chars = Array.from(String(name || ''));
+  return chars.map((ch, i) => (i === 0 || /\s/.test(ch)) ? ch : '*').join('');
+}
+const SecretMenu = (function () {
+  const EYE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  let on = false, pull = null, wheelAcc = 0, wheelT = 0;
+  const items = () => (typeof menu !== 'undefined' && Array.isArray(menu) ? menu : []).filter(i => i.is_secret && i.is_available !== false);
+  // The cafe can rename the secret menu in the dashboard (cafe.secret_menu_name); blank = "Secret menu".
+  const custom = () => (typeof cafeInfo !== 'undefined' && cafeInfo && String(cafeInfo.secret_menu_name || '').trim()) || '';
+  const title = () => custom() || 'Secret menu';
+  const ready = () => {
+    const f = document.getElementById('flipper');
+    const sheetOpen = document.querySelector('.sheet-backdrop.show, .jb-backdrop.open, .catnav-panel.open');
+    return items().length && f && f.classList.contains('settled') && typeof currentPanel !== 'undefined' && currentPanel === 1 && !sheetOpen;
+  };
+
+  // ---- the bits on the page ----
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="sm-pull" id="sm-pull" aria-hidden="true"><span class="sm-eye-ring"><span>' + EYE + '</span></span><span id="sm-pull-text">Keep pulling…</span></div>' +
+    '<div class="sm-veil" id="sm-veil" aria-hidden="true"></div>');
+  const veil = document.getElementById('sm-veil');
+  for (let i = 0; i < 14; i++) {   // vanish-mode bubbles drifting up through the dark
+    const b = document.createElement('i'); const sz = 6 + Math.random() * 22;
+    b.style.cssText = `left:${Math.random() * 100}%;width:${sz}px;height:${sz}px;animation-duration:${7 + Math.random() * 9}s;animation-delay:-${Math.random() * 12}s`;
+    veil.appendChild(b);
+  }
+  function mount() {
+    const center = document.querySelector('.header-center');
+    if (center && !document.getElementById('sm-title')) center.insertAdjacentHTML('afterbegin', '<div class="sm-title" id="sm-title" aria-hidden="true"></div>');
+    const st = document.getElementById('sm-title'); if (st) st.textContent = title();
+    const after = document.getElementById('menu-wrap');
+    if (after && !document.getElementById('secret-wrap')) after.insertAdjacentHTML('afterend', '<div id="secret-wrap" aria-live="polite"></div>');
+  }
+
+  function render() {
+    const wrap = document.getElementById('secret-wrap'); if (!wrap) return;
+    const all = items(), allOpen = all.length && all.every(i => i.secret_visible);
+    const smt = document.getElementById('sm-title'); if (smt) smt.textContent = title();
+    wrap.innerHTML = `<p class="sm-hint">${allOpen ? (custom() ? 'Shh. Welcome to ' + escapeHtml(custom()) + '.' : 'Shh. Welcome to the secret menu.') : 'Shh. Hold the eye to see what it is — let go and it hides again.'}</p>` + all.map((item, idx) => {
+      const qty = itemQtyInCart(item.id);
+      return `<div class="sm-item menu-item" id="mi-row-${item.id}" style="--i:${idx}">
+        <div class="mi-info">
+          <div class="sm-name-row"><span class="sm-name${item.secret_visible ? ' revealed' : ''}" data-sid="${item.id}">${escapeHtml(item.secret_visible ? item.name : maskName(item.name))}</span></div>
+          <span class="sm-price">₹${item.price}</span>
+        </div>
+        <div class="qty-control">${qtyControlHtml(item, qty)}</div>
+        ${item.secret_visible ? '' : `<button type="button" class="sm-eye" data-peek="${item.id}" aria-label="Hold to see this secret item's name">${EYE}</button>`}
+      </div>`;
+    }).join('') + '<button type="button" class="sm-leave" id="sm-leave">' + (custom() ? 'Leave ' + escapeHtml(custom()) : 'Leave the secret menu') + '</button>';
+  }
+
+  // ---- hold the eye to peek ----
+  function peek(id, show) {
+    const item = items().find(i => i.id === id);
+    const el = document.querySelector(`.sm-name[data-sid="${id}"]`), btn = document.querySelector(`.sm-eye[data-peek="${id}"]`);
+    if (!item || !el || item.secret_visible) return;     // the cafe chose to show this name openly
+    el.textContent = show ? item.name : maskName(item.name);
+    el.classList.toggle('revealed', show); if (btn) btn.classList.toggle('held', show);
+  }
+  let held = null;
+  document.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.sm-eye'); if (!b) return;
+    e.preventDefault();
+    try { b.setPointerCapture(e.pointerId); } catch (_) {}   // keep the hold even if the name's width shifts under the finger
+    held = Number(b.dataset.peek); peek(held, true);
+  });
+  const release = () => { if (held != null) { peek(held, false); held = null; } };
+  ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, release));
+  document.addEventListener('contextmenu', e => { if (e.target.closest('.sm-eye')) e.preventDefault(); });
+  document.addEventListener('keydown', e => { const b = e.target.closest && e.target.closest('.sm-eye'); if (b && (e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); peek(Number(b.dataset.peek), true); } });
+  document.addEventListener('keyup', e => { const b = e.target.closest && e.target.closest('.sm-eye'); if (b && (e.key === ' ' || e.key === 'Enter')) peek(Number(b.dataset.peek), false); });
+  document.addEventListener('click', e => { if (e.target.closest('#sm-leave')) toggle(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && on) toggle(false); });
+
+  const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function setOrigin(o) {
+    const x = o ? o.x : window.innerWidth / 2, y = o ? o.y : 0;
+    veil.style.setProperty('--ox', x + 'px'); veil.style.setProperty('--oy', y + 'px');
+    if (!reduced()) {
+      const r = document.createElement('div'); r.className = 'sm-ripple';
+      r.style.setProperty('--rx', x + 'px'); r.style.setProperty('--ry', y + 'px');
+      document.body.appendChild(r); setTimeout(() => r.remove(), 1000);
+    }
+  }
+  function apply(to) {
+    on = to;
+    if (on) { mount(); render(); window.scrollTo({ top: 0 }); if (navigator.vibrate) { try { navigator.vibrate(18); } catch (_) {} } }
+    document.body.classList.toggle('sm-on', on);
+  }
+  function toggle(next, origin) {
+    const to = next === undefined ? !on : next;
+    if (to === on) return;
+    setOrigin(origin);
+    if (to && !reduced()) {                                   // the menu dissolves for a beat before the dark spreads in
+      document.body.classList.add('sm-leaving');
+      setTimeout(() => { document.body.classList.remove('sm-leaving'); apply(true); }, 240);
+    } else apply(to);
+  }
+
+  // ---- tap the cafe's name to open (or leave) it ----
+  const nameEl = document.getElementById('cafe-name');
+  let lastTap = 0;
+  if (nameEl) nameEl.addEventListener('click', () => {
+    if (!on && !ready()) return;                              // only cafes with secret items, once the menu is showing
+    const now = Date.now(); if (now - lastTap < 900) return; lastTap = now;
+    const r = nameEl.getBoundingClientRect();
+    toggle(undefined, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  });
+
+  // ---- pull down from the top ----
+  const pullEl = document.getElementById('sm-pull'), pullText = document.getElementById('sm-pull-text');
+  function showPull(p) {
+    pullEl.style.setProperty('--p', p.toFixed(3));
+    pullText.textContent = p >= 1 ? (on ? 'Release to leave' : (custom() ? 'Release for ' + custom() : 'Release for the secret menu')) : (on ? 'Pull to leave' : 'Keep pulling…');
+  }
+  window.addEventListener('touchstart', e => {
+    if (!ready() || window.scrollY > 2 || e.touches.length !== 1) { pull = null; return; }
+    pull = { y: e.touches[0].clientY, p: 0 };
+  }, { passive: true });
+  window.addEventListener('touchmove', e => {
+    if (!pull) return;
+    const dy = e.touches[0].clientY - pull.y;
+    if (dy <= 0 || window.scrollY > 2) { pull.p = 0; showPull(0); return; }
+    pull.p = Math.min(1, dy / 130);
+    showPull(pull.p);
+  }, { passive: true });
+  window.addEventListener('touchend', () => {
+    if (!pull) return;
+    if (pull.p >= 1) toggle();
+    pull = null; showPull(0);
+  });
+  // desktop: keep scrolling up past the top
+  window.addEventListener('wheel', e => {
+    if (!ready() || window.scrollY > 2 || e.deltaY >= 0) { wheelAcc = 0; showPull(0); return; }
+    wheelAcc += -e.deltaY;
+    showPull(Math.min(1, wheelAcc / 420));
+    clearTimeout(wheelT);
+    wheelT = setTimeout(() => { if (wheelAcc >= 420) toggle(); wheelAcc = 0; showPull(0); }, 260);
+  }, { passive: true });
+
+  // Turn the gesture on once the menu is loaded — and only if this cafe has secret items.
+  const wait = setInterval(() => {
+    if (typeof cafeInfo !== 'undefined' && cafeInfo && typeof menu !== 'undefined') {
+      clearInterval(wait);
+      if (items().length) { document.documentElement.classList.add('sm-ready'); mount(); }
+    }
+  }, 400);
+  return { toggle, render };
+})();
+</script>
+</body>
+
+
+
+
+</html>

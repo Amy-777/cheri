@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>About</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- Reuses the exact same About engine and stylesheet as order.html's About panel — this
+     page is deliberately just that one panel, standalone, with no menu, no order, no table
+     around it. See public.py's GET /order/cafe/{cafe_id}/about for what feeds it. -->
+<link rel="stylesheet" href="about-page.css">
+<script src="amenities.js"></script>
+<script src="about-page.js"></script>
+<script src="about-hotel.js" defer></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #F6F2E9; }
+  body { font-family: 'Inter', sans-serif; -webkit-text-size-adjust: 100%; }
+  .ab-standalone-wrap { max-width: 640px; margin: 0 auto; min-height: 100vh; }
+  .ab-standalone-wrap:has(.ab-t-rooms), .ab-standalone-wrap:has(.ab-t-shop) { max-width: 1280px; }   /* a hotel page with rooms uses the full desktop width (cafe pages stay phone-shaped) */
+  .ab-loading, .ab-error {
+    display: flex; align-items: center; justify-content: center; min-height: 100vh;
+    color: #7B7563; font-size: 14px; text-align: center; padding: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="ab-standalone-wrap">
+  <div class="ab-loading" id="ab-loading">Loading…</div>
+</div>
+
+<script>
+const API_BASE = "https://xyzzy-backend.onrender.com";
+const params = new URLSearchParams(location.search);
+const cafeId = params.get('cafe');
+
+async function loadStandaloneAbout() {
+  const wrap = document.querySelector('.ab-standalone-wrap');
+  if (!cafeId || !/^\d+$/.test(cafeId)) {
+    wrap.innerHTML = '<div class="ab-error">This link looks incomplete — please ask the cafe for their About page link again.</div>';
+    return;
+  }
+  let cafeInfo;
+  try {
+    const res = await fetch(`${API_BASE}/order/cafe/${cafeId}/about`);
+    if (!res.ok) throw new Error('not available');
+    cafeInfo = await res.json();
+  } catch (e) {
+    wrap.innerHTML = '<div class="ab-error">This page isn\'t available right now.</div>';
+    return;
+  }
+
+  document.title = cafeInfo.name ? `About — ${cafeInfo.name}` : 'About';
+
+  const layout = window.AboutPage ? AboutPage.resolve(cafeInfo) : null;
+  if (layout) {
+    document.body.style.background = layout.style.bg;
+    AboutPage.loadFonts(layout.style);
+    wrap.innerHTML = AboutPage.render(layout, cafeInfo, { preview: false });
+    // Same settle-after-entrance fix as order.html's About panel — freezes the
+    // staggered fade-in into a static state once it's genuinely done, so iOS
+    // Safari can't re-rasterize and replay it while the visitor scrolls.
+    const blockCount = wrap.querySelectorAll('.ab-b').length;
+    setTimeout(() => {
+      const abEl = wrap.querySelector('.ab');
+      if (abEl) abEl.classList.add('ab-settled');
+    }, blockCount * 70 + 700);
+  } else {
+    wrap.innerHTML = '<div class="ab-error">This cafe hasn\'t set up their About page yet.</div>';
+  }
+}
+
+loadStandaloneAbout();
+</script>
+</body>
+</html>

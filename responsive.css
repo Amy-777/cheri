@@ -1,0 +1,82 @@
+/* responsive.css — makes the dashboard comfortable on tablets and laptops.
+ *
+ * Loaded by dashboard.html with one <link> AFTER its own styles, and it only adds rules inside
+ * min-width media queries — so on a phone (under 720px) nothing here applies and the app looks exactly as before.
+ *
+ *   ≥ 720px   tablet : wider content column, 2-column lists, page headers on one line, centred dialogs
+ *   ≥ 1100px  laptop : the bottom bar becomes a left sidebar, content uses the full width in several columns
+ */
+
+/* ============================== tablet and up ============================== */
+@media (min-width: 720px) {
+  main { max-width: 920px; padding-left: 24px; padding-right: 24px; }
+  .page-head:not(.page-head-row) { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; }
+  .page-head .btn, .page-head > div[style*="flex"] { width: auto; }
+  .page-head > div[style*="flex"] { flex: 0 0 auto; }
+  .toast { max-width: 460px; }
+  .modal { max-width: 520px; }
+
+  /* lists that were one long column */
+  #view-calls .call-card { max-width: none; }
+  .tc-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
+  .category-items-drop { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+}
+
+/* ================================ laptop ================================== */
+@media (min-width: 1100px) {
+  :root { --sidebar-w: 224px; }
+
+  /* the bottom bar becomes a left sidebar */
+  nav.bottom-nav {
+    top: calc(var(--header-h) + var(--safe-top)); left: 0; right: auto; bottom: 0;
+    width: var(--sidebar-w); height: auto;
+    flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 4px;
+    padding: 16px 12px; overflow-y: auto;
+    border-top: none; border-right: 1px solid var(--border);
+    box-shadow: 8px 0 24px -20px rgba(23,26,33,.35);
+  }
+  .nav-cursor { display: none !important; }
+  nav.bottom-nav button {
+    flex: 0 0 auto; flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px;
+    font-size: 14px; min-height: 46px; padding: 6px 12px; border-radius: 12px;
+    transition: background .15s ease, color .15s ease;
+  }
+  nav.bottom-nav button:hover { background: var(--canvas); }
+  nav.bottom-nav button.active { background: var(--teal-soft); color: var(--teal); }
+  nav.bottom-nav button .nav-icon-wrap, nav.bottom-nav button.active .nav-icon-wrap { background: transparent; transform: none; width: 28px; height: 28px; }
+  nav.bottom-nav button.active .nav-icon, nav.bottom-nav button[data-view="calls"].active .nav-icon { transform: none; }
+  /* Calls keeps its bell, but as a normal row instead of the raised round button */
+  nav.bottom-nav button[data-view="calls"] .nav-icon-wrap { width: 28px; height: 28px; margin-top: 0; border: none; box-shadow: none; background: transparent; }
+  nav.bottom-nav button[data-view="calls"].active .nav-icon-wrap, nav.bottom-nav button[data-view="calls"]:active .nav-icon-wrap { background: transparent; transform: none; }
+  nav.bottom-nav button[data-view="calls"] .nav-icon, nav.bottom-nav button[data-view="calls"].active .nav-icon { color: var(--teal); }
+  nav.bottom-nav button .nav-badge, nav.bottom-nav button[data-view="calls"] .nav-badge { top: 50%; right: 12px; transform: translateY(-50%); }
+
+  /* content sits to the right of the sidebar, and uses the room */
+  main {
+    max-width: none; width: calc(100% - var(--sidebar-w)); margin: 0 0 0 var(--sidebar-w);
+    padding: calc(var(--header-h) + var(--safe-top) + 26px) clamp(28px, calc((100vw - var(--sidebar-w) - 1240px) / 2), 400px) 40px;
+  }
+  body.has-order-bar main { padding-bottom: 110px; }
+  .view-order-bar { left: calc(50% + var(--sidebar-w) / 2); bottom: 20px; max-width: 640px; }
+  .toast { left: calc(var(--sidebar-w) + 14px); bottom: 20px; }
+
+  .page-head h1 { font-size: 24px; }
+  .page-head p { font-size: 14px; }
+
+  /* several columns instead of one long phone column */
+  #view-calls .tab-row, #view-orders .tab-row { max-width: 520px; }
+  .tc-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important; gap: 14px !important; }
+  .tc-sum { max-width: 640px; }
+  .category-items-drop { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .tpl-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .perm-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+}
+
+/* very wide screens: don't let cards stretch into thin ribbons */
+@media (min-width: 1700px) {
+  .tc-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important; }
+}
+
+/* landscape phones and short windows: keep dialogs scrollable */
+@media (max-height: 520px) { .modal { max-height: 94vh; } }

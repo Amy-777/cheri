@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Download chéri app</title>
+<style>
+  :root{--bg:#faf7f2;--ink:#1d1a16;--mut:#6b645a;--acc:#b5532a;--card:#fff;--line:#e8e1d6}
+  @media (prefers-color-scheme:dark){:root{--bg:#161412;--ink:#f3eee6;--mut:#a39b8e;--card:#201d1a;--line:#332f2a}}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  main{max-width:480px;margin:0 auto;padding:32px 16px 48px}
+  h1{font-size:28px;margin:0 0 4px}
+  p.sub{color:var(--mut);margin:0 0 24px}
+  .btn{display:block;text-align:center;background:var(--acc);color:#fff;text-decoration:none;font-weight:600;font-size:18px;padding:16px;border-radius:12px}
+  .meta{text-align:center;color:var(--mut);font-size:13px;margin:8px 0 28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+  .card h2{font-size:16px;margin:0 0 8px}
+  ol{margin:0;padding-left:20px}
+  li{margin:6px 0}
+  .note{font-size:13px;color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+  <h1>chéri app</h1>
+  <p class="sub">For Android phones. Free to install.</p>
+
+  <a class="btn" href="download/cheri.apk" download>Download the app</a>
+  <div class="meta" id="meta">Latest version</div>
+
+  <div class="card">
+    <h2>First time install</h2>
+    <ol>
+      <li>Tap <b>Download the app</b> above (open this page in Chrome).</li>
+      <li>When it finishes, tap <b>Open</b> on the download message.</li>
+      <li>If Android says "For your security, your phone isn't allowed to install unknown apps from this source", tap <b>Settings</b> and switch on <b>Allow from this source</b>, then press back.</li>
+      <li>Tap <b>Install</b>, then <b>Open</b>.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Updating to a new version</h2>
+    <ol>
+      <li>Open this same page again and download the app.</li>
+      <li>Install it over the old one. Do <b>not</b> uninstall first. Your login and data stay.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>If it does not install</h2>
+    <p class="note" style="margin:0">If it says "App not installed", uninstall the old copy once and install again. Still stuck? Message us and we will help.</p>
+  </div>
+</main>
+<script>
+  // Shows the date the file was last updated, if the server tells us.
+  fetch('download/cheri.apk',{method:'HEAD'}).then(function(r){
+    var d=r.headers.get('last-modified');
+    if(d){document.getElementById('meta').textContent='Last updated '+new Date(d).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});}
+  }).catch(function(){});
+</script>
+</body>
+</html>

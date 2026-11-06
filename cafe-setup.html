@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set up your cafe — chéri</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #171A21; --canvas: #F5F6F8; --paper: #FFFFFF;
+    --teal: #E63976; --teal-soft: #FFECD1; --amber: #FF9770;
+    --text: #1A1D24; --text-secondary: #6B7280; --border: #E4E6EA; --danger: #B3432E;
+  }
+  * { box-sizing: border-box; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  body {
+    margin: 0; min-height: 100vh; font-family: 'Inter', sans-serif;
+    background: var(--canvas); color: var(--text); display: flex; align-items: flex-start;
+    justify-content: center; padding: 48px 20px;
+  }
+  h1, h2, .brand { font-family: 'Space Grotesk', sans-serif; }
+  .wrap { width: 100%; max-width: 520px; }
+  .brand { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .brand span { color: var(--amber); }
+
+  .steps { display: flex; gap: 6px; margin: 20px 0 28px; }
+  .step-dot { height: 4px; flex: 1; border-radius: 4px; background: var(--border); }
+  .step-dot.done, .step-dot.active { background: var(--teal); }
+
+  .panel { background: var(--paper); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .panel h2 { font-size: 18px; margin: 0 0 4px; }
+  .panel p.sub { color: var(--text-secondary); font-size: 13.5px; margin: 0 0 22px; }
+
+  label { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 5px; }
+  input, textarea, select {
+    width: 100%; font-family: 'Inter', sans-serif; font-size: 14px; padding: 10px 12px;
+    border-radius: 6px; border: 1px solid var(--border); background: var(--canvas); color: var(--text);
+    margin-bottom: 16px;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--teal); outline-offset: 1px; background: #fff; }
+  .hint { font-size: 12px; color: var(--text-secondary); margin: -10px 0 16px; line-height: 1.5; }
+  .hint code { background: var(--canvas); padding: 1px 5px; border-radius: 4px; }
+
+  .btn {
+    all: unset; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    padding: 11px 20px; border-radius: 6px; cursor: pointer; transition: opacity .15s ease;
+  }
+  .btn-primary { background: var(--teal); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); }
+  .btn:hover { opacity: .9; }
+  .row-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+
+  .error { font-size: 12.5px; color: var(--danger); margin: -10px 0 14px; display: none; }
+  .error.show { display: block; }
+
+  /* Menu step */
+  .item-row {
+    display: grid; grid-template-columns: 1fr 90px 90px auto; gap: 8px; align-items: center; margin-bottom: 10px;
+  }
+  .item-row input { margin-bottom: 0; }
+  .remove-item { all: unset; color: var(--danger); font-size: 12px; cursor: pointer; padding: 6px; }
+  .add-row { all: unset; color: var(--teal); font-size: 13px; font-weight: 600; cursor: pointer; margin: 4px 0 20px; display: inline-block; }
+  .item-row.failed input { border-color: var(--danger); }
+  .btn[disabled] { opacity: .5; cursor: default; pointer-events: none; }
+  .skip-link { all: unset; color: var(--danger); font-weight: 600; text-decoration: underline; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">chéri<span>.</span></div>
+  <div class="steps">
+    <div class="step-dot active" id="dot-1"></div>
+    <div class="step-dot" id="dot-2"></div>
+  </div>
+
+  <!-- Step 1: Cafe name + location -->
+  <div class="panel" id="step-1">
+    <h2>Tell us about your cafe</h2>
+    <p class="sub">This location becomes the reference point for verifying customers are actually on-site when they call a waiter or order.</p>
+
+    <label>Cafe name</label>
+    <input id="cafe-name" placeholder="Brew House">
+
+    <label>Location (from Google Maps)</label>
+    <input id="cafe-coords" placeholder="e.g. 26.7271, 88.3953">
+    <p class="hint">
+      Open your cafe's location in Google Maps, right-click the exact spot → the coordinates
+      copy to your clipboard (e.g. <code>26.7271, 88.3953</code>) — paste them here.
+    </p>
+
+    <label>Address (optional, for display only)</label>
+    <input id="cafe-address" placeholder="12 MG Road, Siliguri">
+
+    <p class="error" id="step1-error"></p>
+    <div class="row-actions">
+      <span></span>
+      <button class="btn btn-primary" onclick="goToStep2()">Continue</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Initial menu -->
+  <div class="panel" id="step-2" style="display:none;">
+    <h2>Add your menu</h2>
+    <p class="sub">Add a few items to start — you can add, edit, or remove items anytime from your dashboard.</p>
+
+    <div id="item-rows"></div>
+    <span class="add-row" onclick="addItemRow()">+ Add another item</span>
+
+    <p class="error" id="step2-error"></p>
+    <div class="row-actions">
+      <button class="btn btn-ghost" onclick="goToStep1()">Back</button>
+      <div>
+        <button class="btn btn-ghost" id="skip-btn" onclick="finishSetup(true)" style="margin-right:8px;">Skip for now</button>
+        <button class="btn btn-primary" id="finish-btn" onclick="finishSetup(false)">Finish setup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://xyzzy-backend.onrender.com"; 
+
+const token = localStorage.getItem('access_token');
+if (!token) window.location.href = 'index.html';
+
+let itemRowCount = 0;
+
+function addItemRow() {
+  itemRowCount++;
+  const wrap = document.getElementById('item-rows');
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.id = 'row-' + itemRowCount;
+  row.innerHTML = `
+    <input placeholder="Item name (e.g. Cold Coffee)" class="i-name">
+    <input placeholder="Price" type="number" min="0" step="any" class="i-price">
+    <input placeholder="Unit (opt.)" class="i-unit" title="Optional — e.g. 250ml, 1L, 1 plate">
+    <button class="remove-item" onclick="document.getElementById('row-${itemRowCount}').remove()">Remove</button>
+  `;
+  wrap.appendChild(row);
+}
+addItemRow(); addItemRow(); // start with two blank rows
+
+function goToStep2() {
+  const error = document.getElementById('step1-error');
+  const name = document.getElementById('cafe-name').value.trim();
+  const coords = document.getElementById('cafe-coords').value.trim();
+  const match = coords.match(/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
+
+  if (!name || !match) {
+    error.textContent = 'Enter a cafe name and valid coordinates (lat, lng).';
+    error.classList.add('show');
+    return;
+  }
+  error.classList.remove('show');
+
+  window._cafeSetup = {
+    name,
+    latitude: parseFloat(match[1]),
+    longitude: parseFloat(match[2]),
+    address_text: document.getElementById('cafe-address').value.trim() || null,
+  };
+
+  document.getElementById('step-1').style.display = 'none';
+  document.getElementById('step-2').style.display = 'block';
+  document.getElementById('dot-1').classList.add('done');
+  document.getElementById('dot-2').classList.add('active');
+}
+
+function goToStep1() {
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-1').style.display = 'block';
+  document.getElementById('dot-2').classList.remove('active');
+}
+
+// Returns { entries, invalid }. entries are { row, item } pairs so a failed
+// item can be traced back to its row. invalid lists rows that have a name but
+// no usable price. A price of 0 is valid (free water, complimentary items).
+// Fully blank rows are ignored.
+function collectItems() {
+  const rows = document.querySelectorAll('.item-row');
+  const entries = [];
+  const invalid = [];
+  rows.forEach(row => {
+    const name = row.querySelector('.i-name').value.trim();
+    const priceRaw = row.querySelector('.i-price').value.trim();
+    const price = parseFloat(priceRaw);
+    const unit = row.querySelector('.i-unit').value.trim();
+    if (!name && !priceRaw && !unit) return; // blank row
+    if (name && priceRaw !== '' && Number.isFinite(price) && price >= 0) {
+      entries.push({ row, item: { name, price, unit: unit || null, description: null } });
+    } else {
+      invalid.push({ row, name });
+    }
+  });
+  return { entries, invalid };
+}
+
+// Pulls a readable message out of a failed response, even if the body isn't JSON.
+async function readError(res, fallback) {
+  try {
+    const body = await res.json();
+    if (typeof body.detail === 'string') return body.detail;
+  } catch (e) { /* non-JSON body */ }
+  return fallback + ' (HTTP ' + res.status + ')';
+}
+
+// JSON of the cafe details that were last saved successfully. Lets a retry
+// skip re-creating the cafe unless the owner went back and changed something.
+let savedCafeJSON = null;
+let saving = false;
+
+function setSaving(on) {
+  saving = on;
+  document.getElementById('finish-btn').disabled = on;
+  document.getElementById('skip-btn').disabled = on;
+  document.getElementById('finish-btn').textContent = on ? 'Saving…' : 'Finish setup';
+}
+
+async function finishSetup(skipItems) {
+  if (saving) return; // guard against double-clicks creating duplicate items
+  const error = document.getElementById('step2-error');
+  error.classList.remove('show');
+  setSaving(true);
+
+  // 0. Check the menu rows before anything is sent, so half-filled rows
+  //    are caught instead of silently skipped.
+  let entries = [];
+  if (!skipItems) {
+    document.querySelectorAll('.item-row').forEach(r => r.classList.remove('failed'));
+    const collected = collectItems();
+    if (collected.invalid.length) {
+      collected.invalid.forEach(({ row }) => row.classList.add('failed'));
+      const names = collected.invalid.map(i => i.name || 'unnamed item');
+      error.textContent = 'Each item needs a name and a price of 0 or more. Fix: ' + names.join(', ') +
+        ' — or clear the row to leave it out.';
+      error.classList.add('show');
+      setSaving(false);
+      return;
+    }
+    entries = collected.entries;
+  }
+
+  const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+  // 1. Cafe details — only sent if not already saved in this session.
+  const cafeJSON = JSON.stringify(window._cafeSetup);
+  if (cafeJSON !== savedCafeJSON) {
+    try {
+      const cafeRes = await fetch(API_BASE + '/cafe/setup', { method: 'POST', headers, body: cafeJSON });
+      if (!cafeRes.ok) throw new Error(await readError(cafeRes, 'Could not save cafe details'));
+      savedCafeJSON = cafeJSON;
+    } catch (err) {
+      error.textContent = err.message === 'Failed to fetch'
+        ? 'Could not reach the server. Check your connection and try again.'
+        : err.message;
+      error.classList.add('show');
+      setSaving(false);
+      return;
+    }
+  }
+
+  if (skipItems) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  // 2. Menu items — every item is attempted; each result is checked.
+  const failed = [];
+  for (const { row, item } of entries) {
+    try {
+      const res = await fetch(API_BASE + '/menu', { method: 'POST', headers, body: JSON.stringify(item) });
+      if (!res.ok) throw new Error(await readError(res, 'Could not save'));
+      row.remove(); // saved — drop the row so a retry won't create a duplicate
+    } catch (err) {
+      row.classList.add('failed');
+      failed.push(item.name + ': ' + (err.message === 'Failed to fetch' ? 'no connection' : err.message));
+    }
+  }
+
+  setSaving(false);
+
+  if (failed.length === 0) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  // 3. Something failed — stay here, show which items, let them retry or move on.
+  if (!document.querySelector('.item-row')) addItemRow();
+  error.innerHTML = '';
+  error.append(
+    failed.length + (failed.length === 1 ? ' item wasn’t' : ' items weren’t') + ' saved — ' + failed.join('; ') +
+    '. Items that saved have been removed from the list. Press Finish setup to retry, or '
+  );
+  const skip = document.createElement('span');
+  skip.className = 'skip-link';
+  skip.textContent = 'go to your dashboard';
+  skip.onclick = () => { window.location.href = 'dashboard.html'; };
+  error.append(skip, ' and add them there.');
+  error.classList.add('show');
+}
+</script>
+</body>
+</html>

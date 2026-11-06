@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bluetooth printer test</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 480px; margin: 40px auto; padding: 0 20px; color: #222; }
+  h1 { font-size: 18px; }
+  button { font-size: 16px; padding: 14px 20px; border-radius: 8px; border: none; background: #171A21; color: #fff; cursor: pointer; width: 100%; }
+  button:active { opacity: .85; }
+  #result { margin-top: 20px; padding: 14px; border-radius: 8px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+  .ok { background: #E3F4EA; color: #1F7A45; }
+  .no { background: #FDE8E6; color: #B3432E; }
+  .info { background: #F0F0F0; color: #444; }
+</style>
+</head>
+<body>
+<h1>Bluetooth printer test</h1>
+<p>This checks ONE thing: can this browser see your thermal printer as a Bluetooth Low Energy (BLE) device? It changes nothing and prints nothing — it's purely a test.</p>
+<button onclick="runTest()">Scan for the printer</button>
+<div id="result"></div>
+
+<script>
+async function runTest() {
+  const el = document.getElementById('result');
+  el.className = 'info';
+  el.textContent = 'Checking…';
+
+  if (!navigator.bluetooth) {
+    el.className = 'no';
+    el.textContent = 'This browser does not support Web Bluetooth at all (common on Safari/iPhone). Try this same page in Chrome or Samsung Internet instead.';
+    return;
+  }
+
+  try {
+    // Shows the browser's real device picker — a built-in, native dialog, not something this page draws.
+    const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
+    el.className = 'ok';
+    el.textContent = 'Found it: "' + (device.name || '(unnamed device)') + '"\n\nThis means your printer IS visible over Bluetooth Low Energy — direct one-tap printing from a website is genuinely possible for it.';
+  } catch (e) {
+    if (e.name === 'NotFoundError') {
+      el.className = 'no';
+      el.textContent = 'No device was selected, or the printer never appeared in the list.\n\nIf you looked for it and it genuinely never showed up: your printer most likely uses "classic" Bluetooth, not BLE — direct browser printing will not work for it. A bridge app on the device (like RawBT) remains the right approach.';
+    } else {
+      el.className = 'no';
+      el.textContent = 'Error: ' + e.message;
+    }
+  }
+}
+</script>
+</body>
+</html>
